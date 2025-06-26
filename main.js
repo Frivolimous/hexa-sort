@@ -6,7 +6,7 @@ const gameConfig = {
     canvasHeight: 800,
 }
 
-const testIndex = 1;
+const testIndex = 0;
 
 const layouts = [
     {
@@ -16,10 +16,6 @@ const layouts = [
                 011110
                 011100`,
         stacks: [
-            {x: 1, y: 1, stack: [0,0,0,0,0,2,2,2,3]},
-            {x: 1, y: 2, stack: [0,0,2,2,2,3,3,3]},
-            {x: 2, y: 1, stack: [3,3,2,2,2]},
-            {x: 1, y: 3, stack: [0,0,0,0,0]}
         ],
     },
     {
@@ -102,6 +98,10 @@ var mainController;
 var canvasView;
 var isMobile;
 var stepper = document.getElementById('stepper');
+var autostepper = document.getElementById('auto-stepper');
+var infoblock = document.getElementById('infoblock');
+var undobutton = document.getElementById('undobutton');
+var resetbutton = document.getElementById('resetbutton');
 
 function init() {
     // select game type
@@ -111,13 +111,25 @@ function init() {
     canvasView = new GameView(document.getElementById('main-canvas'));
     mainController = new MainController();
 
-    stepper.addEventListener("click", mainController.stepSequence);
+    stepper.addEventListener("click", () => mainController.stepSequence());
+    undobutton.addEventListener("click", () => mainController.undoStep());
+    resetbutton.addEventListener("click", () => mainController.reset());
 
     window.addEventListener('keydown', (e) => {
         switch(e.key.toLowerCase()) {
-            // case 'p': mainController.reset(); break;
             case ' ': mainController.stepSequence(); break;
-            // case 'c': mainController.crash.crashed = true; break;
+            case 'q': case 'backspace': mainController.undoStep(); break;
+            case 'p': mainController.reset(); break;
+            case 'v': autostepper.checked = !autostepper.checked; break;
+            case '2': mainController.stepSequence(1); break;
+            case '3': mainController.stepSequence(2); break;
+            case '4': mainController.stepSequence(3); break;
+            case '5': mainController.stepSequence(4); break;
+            case '6': mainController.stepSequence(5); break;
+            case '7': mainController.stepSequence(6); break;
+            case '8': mainController.stepSequence(7); break;
+            case '9': mainController.stepSequence(8); break;
+                break;
         }
     });
 }
@@ -132,56 +144,58 @@ class MainController {
     
     layout;
     
-    tiles = [];
-    width = 0;
+    data;
+    historicData = [];
 
-    palette = [];
-    paletteSpawnIndex = 0;
     paletteLeft = 200;
     paletteY = 650;
     paletteP = 140;
 
-    currentInteraction = 0;
-
     pointerPosition;
-    selectedStack;
+    selectedPaletteIndex = -1;
 
     constructor() {
         this.ticker.onTick = this.onTick;
         this.ticker.start();
-        this.setupBoard(layouts[testIndex]);
+        this.loadHistoricData();
+
+        if (this.historicData.length > 0) {
+            this.layout = layouts[testIndex];
+            this.data = this.historicData[this.historicData.length - 1];
+        } else {
+            this.setupBoard(layouts[testIndex]);
+        }
 
         canvasView.canvas.onPointerDown = (e) => {
             this.pointerPosition = e;
             if (Math.abs(this.paletteY - e.y) < 100) {
                 let x = Math.round((e.x - this.paletteLeft) / this.paletteP);
 
-                if (x >= 0 && x <= 2 && this.palette[x]) {
-                    this.selectedStack = this.palette[x];
-                    this.palette[x].dragging = true;
+                if (x >= 0 && x <= 2 && this.data.palette[x]) {
+                    this.selectedPointerIndex = x;
                 }
             }
         }
+
         canvasView.canvas.onPointerUp = (e) => {
-            if (this.selectedStack) {
+            if (this.selectedPointerIndex >= 0) {
                 var loc = canvasView.getTileFromGlobal(e.x, e.y);
                 let boardX = loc.x;
                 let boardY = loc.y;
 
-                if (boardX >= 0 && boardY < this.width && boardY >= 0) {
-                    var index = boardX + boardY * this.width;
-                    if (index < this.tiles.length) {
-                        if (this.tiles[index].exists && this.tiles[index].stack.length === 0) {
-                            this.tiles[index].addTileStack(this.selectedStack.stack.map(el => el.index));
-                            this.palette[this.selectedStack.x] = null;
-                            this.currentInteraction++;
-                            this.tiles[index].lastInteraction = this.currentInteraction;
+                if (boardX >= 0 && boardY < this.data.width && boardY >= 0) {
+                    var index = boardX + boardY * this.data.width;
+                    if (index < this.data.board.length) {                        
+                        if (this.data.board[index] && this.data.board[index].stack.length === 0) {
+                            this.historicData.push(this.data);
+                            this.saveHistoricData();
+                            this.data = StackManager.cloneData(this.data);
+                            StackManager.placeFromPalette(this.data, index, this.selectedPointerIndex, this.layout);
                         }
                     }
                 }
 
-                this.selectedStack.dragging = false;
-                this.selectedStack = null;
+                this.selectedPointerIndex = -1;
             }
         }
         canvasView.canvas.onPointerMove = (e) => {
@@ -189,163 +203,353 @@ class MainController {
         }
     }
 
-    exportBoard() {
-        var board = [];
+    saveHistoricData() {
+            window.localStorage.setItem('HexHistoricData', JSON.stringify(this.historicData));
+    }
 
-        var board = this.tiles.map(spot => {
-            if (!spot.exists) {
-                return null;
-            } else {
-                return {lastI: spot.lastInteraction, x: spot.x, y: spot.y, stack: spot.stack.map(tile => tile.index)};
-            }
-        });
-        return {board, width: this.width};
+    loadHistoricData() {
+        let historicStr = window.localStorage.getItem('HexHistoricData');
+        if (historicStr && historicStr !== 'undefined') {
+            this.historicData = JSON.parse(historicStr);
+        }
+    }
+
+    clearHistoricData() {
+        this.historicData = [];
+        window.localStorage.setItem('HexHistoricData', undefined);
     }
 
     setupBoard(layout) {
         this.layout = layout;
-        this.paletteSpawnIndex = 0;
+
+        var board = [];
+        var width = 0;
 
         var cells = layout.board.split(`
 `).map(el => [...el.trim()]);
         
-        this.width = cells[0].length;
+        width = cells[0].length;
         cells.forEach((row, y) => {
             row.forEach((el, x) => {
-                this.tiles.push(new BoardSpot(x, y, el === '1'));
+                if (el === '1') {
+                    board[x + y * width] = {lastI: 0, x, y, stack: []};
+                }
             });
         });
 
-        this.tiles.forEach(tile => {
-            let left = this.getSpotAt(tile.x - 1, tile.y);
-            let above = this.getSpotAt(tile.x, tile.y - 1);
-            let skew = tile.y % 2 === 1 ? this.getSpotAt(tile.x - 1, tile.y - 1) : this.getSpotAt(tile.x + 1, tile.y - 1);
-            
-            if (left && left.exists) {
-                tile.connections.push(left);
-                left.connections.push(tile);
-            }
-            if (above && above.exists) {
-                tile.connections.push(above);
-                above.connections.push(tile);
-            }
-            if (skew && skew.exists) {
-                tile.connections.push(skew);
-                skew.connections.push(tile);
-            }
+        layout.stacks.forEach(stack => {
+            board[stack.x + stack.y * width].stack = stack.stack.map(el => el);
         });
 
-        layout.stacks.forEach(stack => {
-            this.addTileStack(stack.x, stack.y, stack.stack);
-        })
+        this.data = {board, width, palette: [], paletteSpawnIndex: 0, currentInteraction: 0, score: 0, time: 0};
+        StackManager.nextPaletteSet(this.data, this.layout);
     }
 
     reset = () => {
+        this.clearHistoricData();
+        this.setupBoard(layouts[testIndex]);
     }
 
-    onTick = () => {
-        if (!this.palette[0] && !this.palette[1] && !this.palette[2]) {
-            this.nextPaletteSet();
-        }
+    undoStep = () => {
+        if (this.historicData.length > 0) this.data = this.historicData.pop();
+        this.saveHistoricData();
+    }
 
+    autoStepDelay = 500;
+    autoStepCount = 0;
+
+    onTick = () => {
         if (this.andDraw) {
             canvasView.drawFrame();
         }
 
         stepper.disabled = !this.canStep();
-    }
 
-    nextPaletteSet() {
-        this.palette = [];
-        for (var i = 0; i < 3; i++) {
-            this.palette[i] = new BoardSpot(i, 0, true);
-            this.palette[i].addTileStack(this.layout.paletteStacks[this.paletteSpawnIndex + i]);
+        if (autostepper.checked) {
+            this.autoStepCount -= this.ticker.framerate;
+            if (this.autoStepCount <= 0) {
+                this.autoStepCount = this.autoStepDelay;
+                this.stepSequence();
+            }
         }
 
-        this.paletteSpawnIndex += 3;
-        if (this.paletteSpawnIndex >= this.layout.paletteStacks.length) {
-            this.paletteSpawnIndex = 0;
-        }
+        this.data.time += this.ticker.framerate;
+
+        this.updateInfo();
     }
 
     draw = () => {
-        var exported = this.exportBoard();
+        this.drawFromData(this.data);
 
-        exported.board.forEach(spot => {
-            if (spot) {
-                canvasView.drawSpot(spot.x, spot.y);
-            }
-        });
-        exported.board.forEach(spot => {
-            if (spot) {
-                spot.stack.forEach((color, i) => canvasView.drawTile(spot.x, spot.y, i, Colors.INDEXED[color]));
-            }
-        });
-
-        this.palette.forEach((tile, i) => {
-            if (tile) {
-                tile.stack.forEach((el, j) => {
-                    if (tile.dragging) {
-                        canvasView.drawPaletteTile(this.pointerPosition.x, this.pointerPosition.y, j, el.color);
+        this.data.palette.forEach((stack, i) => {
+            if (stack) {
+                stack.forEach((el, j) => {
+                    if (i === this.selectedPointerIndex) {
+                        canvasView.drawPaletteTile(this.pointerPosition.x, this.pointerPosition.y, j, Colors.INDEXED[el]);
                     } else {
-                        canvasView.drawPaletteTile(this.paletteLeft + i * this.paletteP, this.paletteY, j, el.color);
+                        canvasView.drawPaletteTile(this.paletteLeft + i * this.paletteP, this.paletteY, j, Colors.INDEXED[el]);
                     }
                 });
             }
         });
     }
 
-    addTileStack(x, y, stack) {
-        this.tiles[x + y * this.width].addTileStack(stack);
-    }
-
-    moveTopTile(fromSpot, toSpot) {
-        toSpot.stack.push(fromSpot.stack.pop());
-    }
-
-    getSpotAt(x, y) {
-        if (x < 0 || y < 0 || x >= this.width) return null;
-        if (x + y * this.width >= this.tiles.length) return null;
-
-        return this.tiles[x + y * this.width];
-    }
-
-    getMatchingConnectedSpots(spot, index) {
-        var m = [];
-        spot.connections.forEach(c => {
-            if (!excludes.includes(c) && c.getTopIndex() === index);
+    drawFromData(data) {
+        data.board.forEach(spot => {
+            if (spot) {
+                canvasView.drawSpot(spot.x, spot.y);
+            }
         });
-
-        return m;
+        data.board.forEach(spot => {
+            if (spot) {
+                spot.stack.forEach((color, i) => canvasView.drawTile(spot.x, spot.y, i, Colors.INDEXED[color]));
+            }
+        });
     }
 
-    stepSequence = () => {
-        var groups = this.findAllGroups();
+    /////
+
+    canStep() {
+        return StackManager.findAllGroups(this.data).length > 0 || StackManager.findTens(this.data).length > 0;
+    }
+
+    stepSequence = (i = 0) => {
+        var groups = StackManager.findAllGroups(this.data);
         if (groups.length > 0) {
-            groups.forEach(this.resolveGroup);
+            this.resolveGroups(i);
         } else {
-            this.clearTens();
+            StackManager.clearTens(this.data);
         }
     }
 
-    numBlankSpots() {
-        var count = 0;
+    resolveGroups = (finalIndex = 0) => {
+        let closed = [];
+        let open = [{data: this.data, prev: null}];
 
-        this.tiles.forEach(el => {
-            if (el.exists && el.stack.length === 0) {
-                count++;
+        while(open.length > 0) {
+            let obj = open.shift();
+
+            let groups = StackManager.findAllGroups(obj.data);
+            if (groups.length > 0) {
+                groups.forEach(group => {
+                    for (var a = 0; a < group.length; a++) {
+                        for (var b = a + 1; b < group.length; b++) {
+                            if (StackManager.measureDistance(group[a], group[b]) === 1) {
+                                newData = StackManager.cloneData(obj.data);
+                                StackManager.moveTopColorFromTo(newData.board[group[b].x + group[b].y * newData.width].stack, newData.board[group[a].x + group[a].y * newData.width].stack);
+                                open.push({data: newData, prev: obj});
+    
+                                var newData = StackManager.cloneData(obj.data);
+                                StackManager.moveTopColorFromTo(newData.board[group[a].x + group[a].y * newData.width].stack, newData.board[group[b].x + group[b].y * newData.width].stack);
+                                open.push({data: newData, prev: obj});
+                            }
+                        }
+                    }
+                });
+            } else {
+                closed.push(obj);
             }
+        }
+
+        closed.forEach(obj => obj.analysis = this.analysePosition(obj));
+
+        closed.sort((a, b) => {
+            if (a.analysis.sections < b.analysis.sections) return -1;
+            if (b.analysis.sections < a.analysis.sections) return 1;
+
+            if (a.analysis.biggestSection >= 10 && b.analysis.biggestSection < 10) return -1;
+            if (b.analysis.biggestSection >= 10 && a.analysis.biggestSection < 10) return 1;
+
+            if (b.analysis.blanks < 3 && a.analysis.blanks > b.analysis.blanks) return -1;
+            if (a.analysis.blanks < 3 && b.analysis.blanks > a.analysis.blanks) return 1;
+
+            if (a.analysis.blanks < b.analysis.blanks) return -1;
+            if (b.analysis.blanks < a.analysis.blanks) return 1;
+
+            if (a.analysis.indexStacks > b.analysis.indexStacks) return -1;
+            if (b.analysis.indexStacks > a.analysis.indexStacks) return 1;
+
+            if (a.analysis.indexStacks === 1 && b.analysis.indexStacks !== 1) return -1;
+            if (b.analysis.indexStacks === 1 && a.analysis.indexStacks !== 1) return 1;
+
+            if (a.analysis.proximityToLastStack > b.analysis.proximityToLastStack) return -1;
+            if (b.analysis.proximityToLastStack > a.analysis.proximityToLastStack) return 1;
         });
 
-        return count;
+        this.historicData.push(this.data);
+        this.saveHistoricData();
+
+        this.data = closed[Math.min(closed.length -1, finalIndex)].analysis.path[1].data;
+
+        console.log(closed.map(el => el.analysis));
+        console.log(closed);
     }
 
-    findAllGroups() {
+    analysePosition(obj) {
+
+        let path = [obj];
+        let prev = obj;
+        while (prev.prev) {
+            path.unshift(prev.prev);
+            prev = prev.prev;
+        }
+
+        let blanks = StackManager.numBlankSpots(obj.data);
+        let sections = StackManager.numSections(obj.data);
+        let lastIndex = obj.data.board.reduce((top, c) => c ? Math.max(c.lastI, top) : top, 0);
+        let lastStack = obj.data.board.find(el => el && el.lastI === lastIndex);
+        let indexStacks = StackManager.getColorOrder(lastStack.stack).length;
+        let biggestSection = StackManager.getBiggestSection(obj.data);
+
+        let proximityToLastStack = obj.data.board.reduce((total, c) => {
+            if (!c) return total;
+            var distance = StackManager.measureDistance(c, lastStack);
+            return total + StackManager.getColorOrder(c.stack).length / (distance + 1);
+        }, 0)
+
+        return {path, blanks, proximityToLastStack, sections, lastIndex, indexStacks, biggestSection};
+    }
+
+    updateInfo() {
+        var txt = '';
+
+        txt += `<br>Score: ${this.data.score}`;
+        txt += `<br>Number of Moves: ${this.data.currentInteraction}`;
+        
+        txt += `<br>Time: ${makeTimeString(this.data.time)}`;
+        infoblock.innerHTML = txt;
+    }
+}
+
+function makeTimeString(ms) {
+    var seconds = Math.floor(ms / 1000);
+    var minutes = Math.floor(seconds / 60);
+    seconds -= minutes * 60;
+
+    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
+
+const StackManager = {
+    countTopColor(stack) {
+        let color = stack[stack.length - 1];
+        var count = 0;
+
+        for (var i = stack.length - 1; i >= 0; i--) {
+            if (stack[i] === color) {
+                count++;
+            } else {
+                return count;
+            }
+        }
+
+        return count;
+    },
+
+    getTopIndex(stack) {
+        if (stack.length > 0) {
+            return stack[stack.length - 1];
+        }
+
+        return -1;
+    },
+
+    purgeTopColor(stack) {
+        var numPurged = 0;
+        let color = stack[stack.length - 1];
+        while(stack.length > 0 && stack[stack.length - 1] === color) {
+            stack.pop();
+            numPurged++;
+        }
+
+        return numPurged;
+    },
+
+    getSpot(data, x, y) {
+        if ((x < 0) || (y < 0) || x > data.width) return null;
+
+        var index = x + y * data.width;
+        if (index > data.board.length - 1) return null;
+
+        return data.board[index];
+    },
+
+    getColorOrder(stack) {
+        var m = [];
+        var index = -1;
+
+        for (var i = 0; i < stack.length; i++) {
+            if (stack[i] !== index) {
+                index = stack[i];
+                m.push(index);
+            }
+        }
+
+        return m;
+    },
+
+    getConnections(data, spot) {
+        var connections = [];
+        var c;
+
+        var skewDirection = spot.y % 2 === 1 ? -1 : 1;
+
+        c = StackManager.getSpot(data, spot.x - 1, spot.y);
+        if (c) connections.push(c);
+        
+        c = StackManager.getSpot(data, spot.x + 1, spot.y);
+        if (c) connections.push(c);
+
+        c = StackManager.getSpot(data, spot.x, spot.y - 1);
+        if (c) connections.push(c);
+        c = StackManager.getSpot(data, spot.x, spot.y + 1);
+        if (c) connections.push(c);
+
+        c = StackManager.getSpot(data, spot.x + skewDirection, spot.y - 1);
+        if (c) connections.push(c);
+        c = StackManager.getSpot(data, spot.x + skewDirection, spot.y + 1);
+        if (c) connections.push(c);
+
+        return connections;
+    },
+
+    moveTopColorFromTo(from, to) {
+        var color = StackManager.getTopIndex(from);
+        while(StackManager.getTopIndex(from) === color) {
+            to.push(from.pop());
+        }
+    },
+
+    moveGroupToLoc(data, x, y) {
+        var target = data.board[x + y * data.width];
+        connections = StackManager.getConnections(data, target);
+
+        connections.forEach(c => {
+            if (StackManager.getTopIndex(c.stack) === StackManager.getTopIndex(target.stack)) {
+                StackManager.moveTopColorFromTo(c.stack, target.stack);
+            }
+        });
+    },
+
+    findTens(data) {
+        return data.board.filter(spot => spot && spot.stack.length >= 10 && StackManager.countTopColor(spot.stack) >= 10);
+    },
+
+    clearTens(data) {
+        data.board.forEach(spot => {
+            if (spot && spot.stack.length >= 10) {
+                if (spot.stack.length >= 10 && StackManager.countTopColor(spot.stack) >= 10) {
+                    data.score += StackManager.purgeTopColor(spot.stack);
+                }
+            }
+        });
+    },
+
+    findAllGroups(data) {
         var groups = [];
         var closed = [];
-        this.tiles.forEach(spot => {
-            if (spot.stack.length > 0 && !closed.includes(spot)) {
-                let top = spot.getTopIndex();
+        data.board.forEach(spot => {
+            if (spot && spot.stack.length > 0 && !closed.includes(spot)) {
+                let top = StackManager.getTopIndex(spot.stack);
                 let group = [spot];
                 let open = [spot];
 
@@ -353,8 +557,10 @@ class MainController {
                     var checking = open.shift();
                     closed.push(checking);
 
-                    checking.connections.forEach(c => {
-                        if (!open.includes(c) && !closed.includes(c) && c.getTopIndex() === top) {
+                    var connections = StackManager.getConnections(data, checking);
+
+                    connections.forEach(c => {
+                        if (!open.includes(c) && !closed.includes(c) && StackManager.getTopIndex(c.stack) === top) {
                             open.push(c);
                             group.push(c);
                         }
@@ -368,92 +574,180 @@ class MainController {
         });
 
         return groups;
-    }
+    },
 
-    canStep() {
-        return this.findAllGroups().length > 0 || this.findTens().length > 0;
-    }
+    measureDistance(a, b) {
+        var aQ = a.x - (a.y + a.y % 2) / 2;
+        var bQ = b.x - (b.y + b.y % 2) / 2;
 
-    resolveGroup = (group) => {
-        if (group.length === 2) {
-            let num0 = group[0].getNumColors();
-            let num1 = group[1].getNumColors();
+        return (Math.abs(bQ - aQ) + Math.abs(b.y - a.y) + Math.abs(aQ + a.y - bQ - b.y)) / 2;
+    },
 
-            if (num1 < num0) {
-                group = [group[1], group[0]];
-                num0 = group[0].getNumColors();
-                num1 = group[1].getNumColors();
+    numBlankSpots(data) {
+        var count = 0;
+
+        data.board.forEach(el => {
+            if (el && el.stack.length === 0) {
+                count++;
             }
+        });
 
-            if (num0 === 1) {
-                if (num1 === 1) {
-                    if (group[0].lastInteraction >= group[1].lastInteraction) {
-                        group[1].moveTopColorTo(group[0]);
-                        console.log("two ones, move to DROPPED 0");
-                    } else {
-                        group[0].moveTopColorTo(group[1]);
-                        console.log("two ones, move to DROPPED 1");
-                    }
-                } else {
-                    if (this.numBlankSpots() >= 3) {
-                        console.log("2+ -> 1 cus lots of space", this.numBlankSpots());
-                        group[1].moveTopColorTo(group[0]);
-                    } else {
-                        console.log("1 -> 2+ cus low on space", this.numBlankSpots());
-                        group[0].moveTopColorTo(group[1]);
-                    }
-                }
-            } else {
-                var secondColor = group[0].getSecondIndex();
-                var numAdjacentSeconds = group[0].connections.filter(c => c.getTopIndex() === secondColor).length;
+        return count;
+    },
 
-                var secondColor2 = group[1].getSecondIndex();
-                var numAdjacentSeconds2 = group[1].connections.filter(c => c.getTopIndex() === secondColor2).length;
+    numSections(data) {
+        var count = 0;
 
-                console.log("SECOND CHECK", secondColor, secondColor2, numAdjacentSeconds, numAdjacentSeconds2);
-
-                if (numAdjacentSeconds > 0 && numAdjacentSeconds2 === 0) {
-                    group[0].moveTopColorTo(group[1]);
-                    console.log('2+ -> 2+, clear way for next combo 1', numAdjacentSeconds);
-                } else if (numAdjacentSeconds2 > 0 && numAdjacentSeconds === 0) {
-                    group[1].moveTopColorTo(group[0]);
-                    console.log('2+ -> 2+, clear way for next combo 0', numAdjacentSeconds2);
-                } else {
-                    if (group[0].lastInteraction > group[1].lastInteraction) {
-                        group[1].moveTopColorTo(group[0]);
-                        console.log("2+ -> 2+ favor PLACED 0", group[0].lastInteraction, group[1].lastInteraction);
-                    } else if (group[0].lastInteraction < group[1].lastInteraction) {
-                        console.log("2+ -> 2+ favor PLACED 1", group[0].lastInteraction, group[1].lastInteraction);
-                        group[0].moveTopColorTo(group[1]);
-                    } else {
-                        group[1].moveTopColorTo(group[0]);
-                        console.log("All Equal: Favor index 0");
-                    }
-                }
+        data.board.forEach(el => {
+            if (el && el.stack.length > 0) {
+                count += StackManager.getColorOrder(el.stack).length;
             }
+        });
 
-            // group[1].moveTopColorTo(group[0]);
-        } else {
-            let first = group[0];
-            for (let i = 1; i < group.length; i++) {
-                group[i].moveTopColorTo(first);
-                console.log("MULTI GROUP (not done yet) goes to index 0");
-            }
-        }
-    }
+        return count;
+    },
 
-    clearTens = () => {
-        this.tiles.forEach(spot => {
-            if (spot.stack.length >= 10) {
-                if (spot.countTopColor() >= 10) {
-                    spot.purgeTopColor();
+    getBiggestSection(data) {
+        var biggest = 0;
+
+        data.board.forEach(el => {
+            if (el && el.stack.length > 0) {
+                let size = 0;
+                let color = -1;
+                for (let i = 0; i < el.stack.length; i++) {
+                    if (el.stack[i] !== color) {
+                        size = 0;
+                        color = el.stack[i];
+                    } else {
+                        size++;
+                        biggest = Math.max(biggest, size);
+                    }
                 }
             }
         });
-    }
 
-    findTens() {
-        return this.tiles.filter(spot => spot.stack.length >= 10 && spot.countTopColor() >= 10);
+        return biggest;
+    },
+
+    cloneData(data) {
+        let board = data.board.map(spot => {
+            if (!spot) return null;
+            return {lastI: spot.lastI, x: spot.x, y: spot.y, stack: spot.stack.map(el => el)};
+        });
+        let width = data.width;
+
+        let palette = data.palette.map(stack => {
+            if (!stack) return null;
+            return stack.map(el => el);
+        })
+
+        return {board, width, palette, paletteSpawnIndex: data.paletteSpawnIndex, currentInteraction: data.currentInteraction, score: data.score, time: data.time};
+    },
+
+    placeFromPalette(data, boardIndex, paletteIndex, layout) {
+        data.board[boardIndex].stack = data.palette[paletteIndex].map(el => el);
+        data.palette[paletteIndex] = null;
+        data.currentInteraction++;
+        data.board[boardIndex].lastI = data.currentInteraction;
+
+        if (!data.palette[0] && !data.palette[1] && !data.palette[2]) {
+            StackManager.nextPaletteSet(data, layout);
+        }
+    },
+
+    nextPaletteSet(data, layout) {
+        if (layout.paletteStacks) {
+            data.palette = [];
+            for (var i = 0; i < 3; i++) {
+                data.palette.push(layout.paletteStacks[data.paletteSpawnIndex + i].map(el => el));
+            }
+    
+            if (data.paletteSpawnIndex >= layout.paletteStacks.length) {
+                data.paletteSpawnIndex = 0;
+            }
+        } else {
+            data.palette = [];
+            for (var i = 0; i < 3; i++) {
+                data.palette.push(StackManager.generateRandomPaletteStack(data.paletteSpawnIndex));
+            }
+        }
+           
+        data.paletteSpawnIndex += 3;
+    },
+
+    generateRandomPaletteStack(paletteSpawnIndex) {
+        var maxColor = StackManager.getMaxColorIndex(paletteSpawnIndex);
+
+        let total = StackManager.getRandomTotalSize(paletteSpawnIndex);
+        let count = StackManager.getRandomNumColors(paletteSpawnIndex, total);
+
+        let counts = [0, 0, 0];
+        let colors = [-1, -1, -1];
+
+        
+        colors[0] = Math.floor(Math.random() * (maxColor + 1));
+        if (count > 1) {
+            counts[0] = Math.ceil(Math.random() * (total - count + 1));
+        } else {
+            counts[0] = total;
+        }
+
+        if (count >= 2) {
+            do {
+                colors[1] = Math.floor(Math.random() * (maxColor + 1));
+            } while (colors[1] === colors[0]);
+            if (count > 2) {
+                counts[1] = Math.ceil(Math.random() * (total - counts[0] - count + 2));
+            } else {
+                counts[1] = total - counts[0];
+            }
+        }
+
+        if (count === 3) {
+            do {
+                colors[2] = Math.floor(Math.random() * (maxColor + 1));
+            } while (colors[2] === colors[0] || colors[2] === colors[1]);
+
+            counts[2] = total - counts[0] - counts[1];
+        }
+
+        let stack = [];
+
+        for (var i = 0; i < count; i++) {
+            for (var j = 0; j < counts[i]; j++) {
+                stack.push(colors[i]);
+            }
+        }
+
+        return stack;
+    },
+
+    getRandomTotalSize(paletteSpawnIndex) {
+        var min = Math.min(4, Math.floor(paletteSpawnIndex / 20) + 2);
+        var max = 6;
+        return min + Math.floor(Math.random() * (max + 1 - min));
+    },
+
+    getRandomNumColors(paletteSpawnIndex, stackSize) {
+        return Math.min(stackSize, 3, Math.ceil(Math.random() * (2 + paletteSpawnIndex / 20)));
+    },
+
+    getMaxColorIndex(paletteSpawnIndex) {
+        var thresholds = [
+            0,
+            0,
+            0,
+            3,  //3
+            6, //4
+            12, //5
+            15, //6
+            21 //7
+            // 38 = DEAD
+        ];
+
+        for (var count = thresholds.length - 1; count >= 0; count--) {
+            if (paletteSpawnIndex >= thresholds[count]) return count;
+        }
     }
 }
 
@@ -545,111 +839,6 @@ class GameView {
     }
 }
 
-class BoardSpot {
-    x;
-    y;
-    exists = false;
-    dragging = false;
-    lastInteraction = 0;
-    stack = [];
-    connections = [];
-
-    constructor(x, y, exists) {
-        this.x = x; this.y = y;
-        this.exists = exists;
-    }
-
-    getNumColors() {
-        return this.getIndexOrder().length;
-    }
-
-    getIndexOrder() {
-        var m = [];
-        var index = -1;
-
-        for (var i = 0; i < this.stack.length; i++) {
-            if (this.stack[i].index !== index) {
-                index = this.stack[i].index;
-                m.push(index);
-            }
-        }
-
-        return m;
-    }
-
-    getTopColor() {
-        return this.stack[this.stack.length - 1];
-    }
-
-    getSecondIndex() {
-        var colors = this.getIndexOrder();
-        if (colors.length >= 2) return colors[colors.length - 2];
-
-        return -1;
-    }
-
-    getTopIndex() {
-        if (this.stack.length > 0) {
-            return this.stack[this.stack.length - 1].index;
-        }
-
-        return -1;
-    }
-
-    countTopColor() {
-        let color = this.stack[this.stack.length - 1].index;
-        var count = 0;
-        for (var i = this.stack.length - 1; i >= 0; i--) {
-            if (this.stack[i].index === color) {
-                count++;
-            } else {
-                return count;
-            }
-        }
-        
-        return count;
-    }
-
-    purgeTopColor() {
-        let color = this.stack[this.stack.length - 1].index;
-        while(this.stack.length > 0 && this.stack[this.stack.length - 1].index === color) {
-            this.stack.pop();
-        }
-    }
-
-    addTile(color) {
-        this.stack.push(new GameTile(color));
-    }
-
-    addTiles(color, count) {
-        for (let i = 0; i < count; i++) {
-            this.addTile(color);
-        }
-    }
-
-    addTileStack(stack) {
-        stack.forEach(i => this.addTile(i));
-    }
-
-    moveTopColorTo(target) {
-        var color = this.getTopIndex();
-        while(this.getTopIndex() === color) {
-            target.stack.push(this.stack.pop());
-        }
-    }
-}
-
-class GameTile {
-    color;
-    index;
-    addedAt = 0;
-
-    constructor(index) {
-        this.index = index;
-        this.color = Colors.INDEXED[index];
-    }
-}
-
 const Colors = {
     RED: '#ff0000',
     GREEN: '#00ff00',
@@ -675,3 +864,4 @@ Colors.INDEXED = [
 ];
 
 init();
+
