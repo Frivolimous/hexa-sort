@@ -179,7 +179,8 @@ class MainController {
 
         canvasView.canvas.onPointerUp = (e) => {
             if (this.selectedPointerIndex >= 0) {
-                var loc = canvasView.getTileFromGlobal(e.x, e.y);
+                let offset = 10;
+                var loc = canvasView.getTileFromGlobal(e.x, e.y + offset);
                 let boardX = loc.x;
                 let boardY = loc.y;
 
