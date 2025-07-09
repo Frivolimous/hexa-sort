@@ -95,11 +95,11 @@ class CanvasRender {
         this.Graphic.fill();
     }
 
-    drawRect(x, y, width, height, color, alpha = 1) {
+    drawRect(x, y, width, height, color, strokeColor, alpha = 1) {
         this.Graphic.beginPath();
         this.Graphic.rect(x, y, width, height);
         this.Graphic.fillStyle = color;
-        this.Graphic.strokeStyle = "#000000";
+        this.Graphic.strokeStyle = strokeColor;
         this.Graphic.lineWidth = 2;
         this.Graphic.globalAlpha = Math.max(alpha, 0);
         this.Graphic.fill();

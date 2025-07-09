@@ -6,7 +6,7 @@ const gameConfig = {
     canvasHeight: 800,
 }
 
-const testIndex = 0;
+const testIndex = 3;
 
 const layouts = [
     {
@@ -17,6 +17,7 @@ const layouts = [
                 011100`,
         stacks: [
         ],
+        numPalette: 3,
     },
     {
         board: `01111100
@@ -37,7 +38,7 @@ const layouts = [
             {x: 4, y: 3, stack: [3,3,3,0,0,0,4,4,4]},
             {x: 5, y: 3, stack: [4,4,4,1,1,1,2,2,2]}
         ],
-
+        numPalette: 3,
         paletteStacks: [
             [2,2,2,0,0],
             [5,5,5,5,5],
@@ -88,8 +89,116 @@ const layouts = [
             [6,6,6,6],
             [5,5,7,7,7]
         ]
-    }
+    },
+    {
+        board: `011100
+                001100
+                110110
+                011110
+                010100`,
+
+        stacks: [],
+        numPalette: 3,
+    },
+    {
+        board: `1111111111
+                1111111111
+                1111111111
+                1111111111
+                1111111111
+                1111111111
+                1111111111
+                1111111111`,
+        stacks: [
+        ],
+        tileHp: 2,
+        numPalette: 4
+    },
+    {
+        board: `1111111111
+                1111111111
+                1111111111
+                1111111111
+                1111111111
+                1111111111
+                1111111111
+                1111111111`,
+        stacks: [
+            {x: 4, y: 0, stack: [2,2,2]},
+            {x: 5, y: 0, stack: [0,0,0]},
+            {x: 6, y: 0, stack: [1,1,1]},
+            {x: 7, y: 0, stack: [4,4,4]},
+            {x: 8, y: 0, stack: [3,3,3]},
+            {x: 9, y: 0, stack: [2,2,2]},
+            {x: 4, y: 1, stack: [6,6,6]},
+            {x: 5, y: 1, stack: [4,4,4]},
+            {x: 6, y: 1, stack: [3,3,3]},
+            {x: 7, y: 1, stack: [2,2,2]},
+            {x: 8, y: 1, stack: [6,6,6]},
+            {x: 9, y: 1, stack: [4,4,4]},
+            {x: 3, y: 2, stack: [5,5,5]},
+            {x: 4, y: 2, stack: [2,2,2]},
+            {x: 5, y: 2, stack: [1,1,1]},
+            {x: 6, y: 2, stack: [4,4,4]},
+            {x: 7, y: 2, stack: [3,3,3]},
+            {x: 8, y: 2, stack: [0,0,0]},
+            {x: 9, y: 2, stack: [2,2,2]},
+            {x: 3, y: 3, stack: [1,1,1]},
+            {x: 4, y: 3, stack: [0,0,0]},
+            {x: 5, y: 3, stack: [3,3,3]},
+            {x: 6, y: 3, stack: [2,2,2]},
+            {x: 7, y: 3, stack: [1,1,1]},
+            {x: 8, y: 3, stack: [6,6,6]},
+            {x: 9, y: 3, stack: [5,5,5]},
+            {x: 0, y: 4, stack: [0,0,0]},
+            {x: 1, y: 4, stack: [3,3,3]},
+            {x: 2, y: 4, stack: [2,2,2]},
+            {x: 3, y: 4, stack: [6,6,6]},
+            {x: 4, y: 4, stack: [4,4,4]},
+            {x: 5, y: 4, stack: [0,0,0]},
+            {x: 6, y: 4, stack: [3,3,3]},
+            {x: 7, y: 4, stack: [2,2,2]},
+            {x: 8, y: 4, stack: [4,4,4]},
+            {x: 9, y: 4, stack: [6,6,6]},
+            {x: 0, y: 5, stack: [7,7,7]},
+            {x: 1, y: 5, stack: [2,2,2]},
+            {x: 2, y: 5, stack: [1,1,1]},
+            {x: 3, y: 5, stack: [4,4,4]},
+            {x: 4, y: 5, stack: [0,0,0]},
+            {x: 5, y: 5, stack: [5,5,5]},
+            {x: 6, y: 5, stack: [4,4,4]},
+            {x: 7, y: 5, stack: [1,1,1]},
+            {x: 8, y: 5, stack: [6,6,6]},
+            {x: 9, y: 5, stack: [2,2,2]},
+            {x: 0, y: 6, stack: [3,3,3]},
+            {x: 1, y: 6, stack: [0,0,0]},
+            {x: 2, y: 6, stack: [6,6,6]},
+            {x: 3, y: 6, stack: [3,3,3]},
+            {x: 4, y: 6, stack: [2,2,2]},
+            {x: 5, y: 6, stack: [1,1,1]},
+            {x: 6, y: 6, stack: [6,6,6]},
+            {x: 7, y: 6, stack: [2,2,2]},
+            {x: 8, y: 6, stack: [5,5,5]},
+            {x: 9, y: 6, stack: [3,3,3]},
+            {x: 0, y: 7, stack: [7,7,7]},
+            {x: 1, y: 7, stack: [2,2,2]},
+            {x: 2, y: 7, stack: [5,5,5]},
+            {x: 3, y: 7, stack: [1,1,1]},
+            {x: 4, y: 7, stack: [6,6,6]},
+            {x: 5, y: 7, stack: [3,3,3]},
+            {x: 6, y: 7, stack: [0,0,0]},
+            {x: 7, y: 7, stack: [1,1,1]},
+            {x: 8, y: 7, stack: [0,0,0]},
+            {x: 9, y: 7, stack: [2,2,2]},
+        ],
+        tileHp: 2,
+        numPalette: 4
+    },
 ];
+
+const header = {
+    interactions: document.getElementById('interaction-select-container'),
+};
 
 // GameControl
 var mainController;
@@ -132,20 +241,59 @@ function init() {
                 break;
         }
     });
+
+    addInteractionButton('Basic Hex', 0);
+    // addInteractionButton('TestReplay', 1);
+    addInteractionButton('SmallerBoard', 2);
+    addInteractionButton('GiantLimitedBoard', 3);
+    addInteractionButton('GiantLimitedPopulated', 4);
+    let data = DataManager.loadHistoricData();
+    mainController.setupBoard(layouts[testIndex], data);
 }
 
 function testMobile() {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
 
+function addInteractionButton(text, index) {
+    var newButton = document.createElement('button');
+    newButton.classList.add('interaction-select-button');
+    newButton.innerHTML = text;
+    newButton.onclick = () => {
+        mainController.setupBoard(layouts[index]);
+        document.activeElement.blur();
+    }
+    header.interactions.appendChild(newButton);
+}
+
+const DataManager = {
+    saveHistoricData(data) {
+            window.localStorage.setItem('HexHistoricData', JSON.stringify(data));
+    },
+
+    loadHistoricData() {
+        let historicStr = window.localStorage.getItem('HexHistoricData');
+        console.log(historicStr);
+        if (!historicStr || historicStr === 'undefined') return;
+
+        var m = JSON.parse(historicStr);
+        console.log(m, m.history);
+        if (m.history) {
+            return m;
+        }
+    },
+
+    clearHistoricData() {
+        window.localStorage.setItem('HexHistoricData', undefined);
+    },
+}
+
 class MainController {
     ticker = new JMTicker(gameConfig.framerate);
     andDraw = true;
-    
-    layout;
-    
+        
     data;
-    historicData = [];
+    historicData = {};
 
     paletteLeft = 200;
     paletteY = 650;
@@ -154,44 +302,52 @@ class MainController {
     pointerPosition;
     selectedPaletteIndex = -1;
 
+    draggingBoard = null;
+
     constructor() {
         this.ticker.onTick = this.onTick;
         this.ticker.start();
-        this.loadHistoricData();
-
-        if (this.historicData.length > 0) {
-            this.layout = layouts[testIndex];
-            this.data = this.historicData[this.historicData.length - 1];
-        } else {
-            this.setupBoard(layouts[testIndex]);
-        }
 
         canvasView.canvas.onPointerDown = (e) => {
             this.pointerPosition = e;
             if (Math.abs(this.paletteY - e.y) < 100) {
                 let x = Math.round((e.x - this.paletteLeft) / this.paletteP);
 
-                if (x >= 0 && x <= 2 && this.data.palette[x]) {
+                if (x >= 0 && x < this.historicData.layout.numPalette && this.data.palette[x]) {
                     this.selectedPointerIndex = x;
+                    return;
                 }
+            }
+            if (e.y < this.paletteY - 100) {
+                this.draggingBoard = {x: e.x - canvasView.offset.x, y: e.y - canvasView.offset.y};
             }
         }
 
         canvasView.canvas.onPointerUp = (e) => {
+            this.draggingBoard = null;
+
             if (this.selectedPointerIndex >= 0) {
                 let offset = 10;
                 var loc = canvasView.getTileFromGlobal(e.x, e.y + offset);
-                let boardX = loc.x;
-                let boardY = loc.y;
 
-                if (boardX >= 0 && boardY < this.data.width && boardY >= 0) {
-                    var index = boardX + boardY * this.data.width;
-                    if (index < this.data.board.length) {                        
-                        if (this.data.board[index] && this.data.board[index].stack.length === 0) {
-                            this.historicData.push(this.data);
-                            this.saveHistoricData();
-                            this.data = StackManager.cloneData(this.data);
-                            StackManager.placeFromPalette(this.data, index, this.selectedPointerIndex, this.layout);
+                if (e.y < this.paletteY - 100) {
+                    if (loc.x >= 0 && loc.y < this.data.width && loc.y >= 0) {
+                        var index = loc.x + loc.y * this.data.width;
+                        if (index < this.data.board.length && this.data.board[index].hp >= 0) {                        
+                            if (this.data.board[index] && this.data.board[index].stack.length === 0) {
+                                this.historicData.history.push(this.data);
+                                DataManager.saveHistoricData(this.historicData);
+                                this.data = StackManager.cloneData(this.data);
+
+                                if (this.data.board[index].hp > 0) {
+                                    if (this.data.board[index].hp === 1) {
+                                        this.data.board[index].hp = -1;
+                                    } else {
+                                        this.data.board[index].hp--;
+                                    }
+                                }
+                                StackManager.placeFromPalette(this.data, index, this.selectedPointerIndex, this.historicData.layout);
+                            }
                         }
                     }
                 }
@@ -199,29 +355,32 @@ class MainController {
                 this.selectedPointerIndex = -1;
             }
         }
+
         canvasView.canvas.onPointerMove = (e) => {
             this.pointerPosition = e;
+
+            if (this.draggingBoard) {
+                canvasView.offset.x = e.x - this.draggingBoard.x;
+                canvasView.offset.y = e.y - this.draggingBoard.y;
+            }
         }
     }
 
-    saveHistoricData() {
-            window.localStorage.setItem('HexHistoricData', JSON.stringify(this.historicData));
-    }
+    setupBoard(layout, historicData) {
+        canvasView.offset = {x: 0, y: 0};
 
-    loadHistoricData() {
-        let historicStr = window.localStorage.getItem('HexHistoricData');
-        if (historicStr && historicStr !== 'undefined') {
-            this.historicData = JSON.parse(historicStr);
+        if (historicData) {
+            this.historicData = historicData;
+            this.data = this.historicData.history[this.historicData.history.length - 1];
+            if (!this.data) this.setupBoard(layout);
+            return;
+        } else {
+            this.historicData = {
+                layout,
+                history: []
+            };
+            DataManager.clearHistoricData();
         }
-    }
-
-    clearHistoricData() {
-        this.historicData = [];
-        window.localStorage.setItem('HexHistoricData', undefined);
-    }
-
-    setupBoard(layout) {
-        this.layout = layout;
 
         var board = [];
         var width = 0;
@@ -233,7 +392,7 @@ class MainController {
         cells.forEach((row, y) => {
             row.forEach((el, x) => {
                 if (el === '1') {
-                    board[x + y * width] = {lastI: 0, x, y, stack: []};
+                    board[x + y * width] = {lastI: 0, x, y, stack: [], hp: layout.tileHp || 0};
                 }
             });
         });
@@ -243,17 +402,18 @@ class MainController {
         });
 
         this.data = {board, width, palette: [], paletteSpawnIndex: 0, currentInteraction: 0, score: 0, time: 0};
-        StackManager.nextPaletteSet(this.data, this.layout);
+        StackManager.nextPaletteSet(this.data, this.historicData.layout);
     }
 
     reset = () => {
-        this.clearHistoricData();
+        this.historicData = {};
+        DataManager.clearHistoricData();
         this.setupBoard(layouts[testIndex]);
     }
 
     undoStep = () => {
-        if (this.historicData.length > 0) this.data = this.historicData.pop();
-        this.saveHistoricData();
+        if (this.historicData.history.length > 0) this.data = this.historicData.history.pop();
+        DataManager.saveHistoricData(this.historicData);
     }
 
     autoStepDelay = 500;
@@ -282,6 +442,8 @@ class MainController {
     draw = () => {
         this.drawFromData(this.data);
 
+        canvasView.canvas.drawRect(0, this.paletteY - 100, gameConfig.canvasWidth, gameConfig.canvasHeight - this.paletteY + 100, "#eeeeee", '#eeeeee');
+
         this.data.palette.forEach((stack, i) => {
             if (stack) {
                 stack.forEach((el, j) => {
@@ -297,8 +459,8 @@ class MainController {
 
     drawFromData(data) {
         data.board.forEach(spot => {
-            if (spot) {
-                canvasView.drawSpot(spot.x, spot.y);
+            if (spot && spot.hp >= 0) {
+                canvasView.drawSpot(spot.x, spot.y, spot.hp);
             }
         });
         data.board.forEach(spot => {
@@ -316,6 +478,7 @@ class MainController {
 
     stepSequence = (i = 0) => {
         var groups = StackManager.findAllGroups(this.data);
+        // console.log(groups);
         if (groups.length > 0) {
             this.resolveGroups(i);
         } else {
@@ -377,10 +540,11 @@ class MainController {
             if (b.analysis.proximityToLastStack > a.analysis.proximityToLastStack) return 1;
         });
 
-        this.historicData.push(this.data);
-        this.saveHistoricData();
-
-        this.data = closed[Math.min(closed.length -1, finalIndex)].analysis.path[1].data;
+        this.historicData.history.push(this.data);
+        DataManager.saveHistoricData(this.historicData);
+        if (closed.length > 0) {
+            this.data = StackManager.cloneData(closed[Math.min(closed.length -1, finalIndex)].analysis.path[1].data);
+        }
 
         console.log(closed.map(el => el.analysis));
         console.log(closed);
@@ -466,7 +630,7 @@ const StackManager = {
     },
 
     getSpot(data, x, y) {
-        if ((x < 0) || (y < 0) || x > data.width) return null;
+        if ((x < 0) || (y < 0) || x >= data.width) return null;
 
         var index = x + y * data.width;
         if (index > data.board.length - 1) return null;
@@ -633,7 +797,7 @@ const StackManager = {
     cloneData(data) {
         let board = data.board.map(spot => {
             if (!spot) return null;
-            return {lastI: spot.lastI, x: spot.x, y: spot.y, stack: spot.stack.map(el => el)};
+            return {lastI: spot.lastI, x: spot.x, y: spot.y, stack: spot.stack.map(el => el), hp: spot.hp};
         });
         let width = data.width;
 
@@ -651,7 +815,14 @@ const StackManager = {
         data.currentInteraction++;
         data.board[boardIndex].lastI = data.currentInteraction;
 
-        if (!data.palette[0] && !data.palette[1] && !data.palette[2]) {
+        var paletteClear = true;
+        data.palette.forEach(el => {
+            if (el) {
+                paletteClear = false;
+            }
+        });
+
+        if (paletteClear) {
             StackManager.nextPaletteSet(data, layout);
         }
     },
@@ -659,7 +830,7 @@ const StackManager = {
     nextPaletteSet(data, layout) {
         if (layout.paletteStacks) {
             data.palette = [];
-            for (var i = 0; i < 3; i++) {
+            for (var i = 0; i < layout.numPalette; i++) {
                 data.palette.push(layout.paletteStacks[data.paletteSpawnIndex + i].map(el => el));
             }
     
@@ -668,12 +839,12 @@ const StackManager = {
             }
         } else {
             data.palette = [];
-            for (var i = 0; i < 3; i++) {
+            for (var i = 0; i < layout.numPalette; i++) {
                 data.palette.push(StackManager.generateRandomPaletteStack(data.paletteSpawnIndex));
             }
         }
            
-        data.paletteSpawnIndex += 3;
+        data.paletteSpawnIndex += layout.numPalette;
     },
 
     generateRandomPaletteStack(paletteSpawnIndex) {
@@ -742,8 +913,9 @@ const StackManager = {
             6, //4
             12, //5
             15, //6
-            21 //7
-            // 38 = DEAD
+            21, //7
+            // 36, //8 : BROWN
+            // 57, // 9 : PINK
         ];
 
         for (var count = thresholds.length - 1; count >= 0; count--) {
@@ -768,25 +940,33 @@ class GameView {
     yx = -0.42;
     yy = 0.75;
 
+    offset = {x: 0, y: 0};
+
     constructor(canvasElement) {
         this.canvas = new CanvasRender(gameConfig.canvasWidth, gameConfig.canvasHeight, canvasElement);
 
         this.short = this.radius * Math.sin(2 * Math.PI / 6) * 2;
     }
 
-    drawSpot(x, y) {
+    drawSpot(x, y, hp) {
         var global = this.getGlobalFromTile(x, y);
+        var color = '#cccccc';
+        if (hp === 1) {
+            color = '#ffcccc';
+        } else if (hp === -1) {
+            color = '#eeeeee';
+        }
         this.canvas.drawHexagon2(global.x,
                                 global.y,
-                                this.radius, 0.6, '#cccccc', 1, this.tilt);
+                                this.radius, 0.6, color, 1, this.tilt);
     }
 
     drawTile(x, y, height, color) {
         var baseX = x - (y % 2 === 1 ? 0.5 : 0);
         var baseY = y;
-        this.canvas.drawHexagon2(this.left + baseX * this.xx * this.short + baseY * this.yx * this.short,
-                                (this.top + baseX * this.xy * this.short + baseY * this.yy * this.short) * this.tilt - height * this.heightAmount,
-                        this.radius, 0.7, color, 1, this.tilt);
+        this.canvas.drawHexagon2(this.offset.x + this.left + baseX * this.xx * this.short + baseY * this.yx * this.short,
+                                this.offset.y + (this.top + baseX * this.xy * this.short + baseY * this.yy * this.short) * this.tilt - height * this.heightAmount,
+                                this.radius, 0.7, color, 1, this.tilt);
 
     }
 
@@ -795,6 +975,8 @@ class GameView {
     }
 
     getTileFromGlobal(x, y) {
+        x -= this.offset.x;
+        y -= this.offset.y;
         var point = {x: 0, y: 0};
         var point0 = {x: this.left, y: this.top};
         var point1 = {x: this.left + this.short * this.xx, y: this.top + this.short * this.xy * this.tilt};
@@ -818,8 +1000,8 @@ class GameView {
 
         x = x - (y % 2 === 1 ? 0.5 : 0);
 
-        point.x = this.left + this.short * (x * this.xx + y * this.yx);
-        point.y = (this.top + this.short * (x * this.xy + y * this.yy)) * this.tilt;
+        point.x = this.left + this.short * (x * this.xx + y * this.yx) + this.offset.x;
+        point.y = (this.top + this.short * (x * this.xy + y * this.yy)) * this.tilt + this.offset.y;
 
         return point;
     }
@@ -849,6 +1031,8 @@ const Colors = {
     MAGENTA: '#ff00ff',
     WHITE: '#ffffff',
     BLACK: '#333333',
+    BROWN: '#AA6633',
+    PINK: '#FF99BB',
 
     INDEXED: [],
 }
@@ -862,6 +1046,8 @@ Colors.INDEXED = [
     Colors.MAGENTA,
     Colors.WHITE,
     Colors.BLACK,
+    Colors.BROWN,
+    Colors.PINK,
 ];
 
 init();
