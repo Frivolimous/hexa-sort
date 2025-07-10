@@ -155,3 +155,35 @@ update(canvas, percent) {
     canvas.drawRect(this.x, this.y, Math.min(1, percent / 0.8) * this.width, this.height, color);
 }
 }
+
+function makeTimeString(ms) {
+    var seconds = Math.floor(ms / 1000);
+    var minutes = Math.floor(seconds / 60);
+    seconds -= minutes * 60;
+
+    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
+
+function testMobile() {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+
+const SaveManager = {
+    saveHistoricData(data) {
+            window.localStorage.setItem('HexHistoricData', JSON.stringify(data));
+    },
+
+    loadHistoricData() {
+        let historicStr = window.localStorage.getItem('HexHistoricData');
+        if (!historicStr || historicStr === 'undefined') return;
+
+        var m = JSON.parse(historicStr);
+        if (m.history) {
+            return m;
+        }
+    },
+
+    clearHistoricData() {
+        window.localStorage.setItem('HexHistoricData', undefined);
+    },
+}

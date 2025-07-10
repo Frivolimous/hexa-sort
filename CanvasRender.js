@@ -33,12 +33,24 @@ class CanvasRender {
             window.setTimeout(e => swiping = null, swipeMaxTime);
         });
 
-        element.addEventListener('pointerup', e => {
+        element.addEventListener('mouseup', e => {
             let r = element.getBoundingClientRect();
             
             var location = {x: e.offsetX * element.width / r.width, y: e.offsetY * element.height / r.height};
             this.onPointerUp && this.onPointerUp(location);
 
+            swiping = null;
+        });
+
+        element.addEventListener('touchend', e => {
+            let r = element.getBoundingClientRect();
+            
+            var x = e.changedTouches[0].pageX * element.width / r.width - r.x;
+            var y = e.changedTouches[0].pageY * element.height / r.height - r.y - 50;
+
+            var location = {x, y};
+            this.onPointerUp && this.onPointerUp(location);
+            
             swiping = null;
         });
 
@@ -48,8 +60,8 @@ class CanvasRender {
 
         element.addEventListener('touchmove', e => {
             let r = element.getBoundingClientRect();
-            var x = e.targetTouches[0].pageX * element.width / r.width;
-            var y = e.targetTouches[0].pageY * element.height / r.height;
+            var x = e.changedTouches[0].pageX * element.width / r.width - r.x;
+            var y = e.changedTouches[0].pageY * element.height / r.height - r.y - 50;
             var location = {x, y};
             this.onPointerMove && this.onPointerMove(location);
 

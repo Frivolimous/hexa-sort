@@ -1,4 +1,21 @@
+#main-canvas {
+    width: 300px;
+}
+
+@media (pointer:none), (pointer:coarse) {
     #main-canvas {
-        height: 400px;
-        width: 400px;
+        width: 100%;
     }
+
+    body {
+        font-size: 2em;
+    }
+
+    .ui-button {
+        font-size: 1em;
+    }
+
+    .interaction-select-button {
+        font-size: 1em;
+    }
+}
