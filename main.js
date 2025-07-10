@@ -454,7 +454,13 @@ class GameView {
 
     drawFrame() {
         this.canvas.clear();
-        this.canvas.drawBackground('#eeeeee');
+        if (!this.imageData) {
+            this.imageData = this.makeImageData();
+            this.cycleStripes(this.imageData);
+        }
+        
+        this.canvas.Graphic.putImageData(this.imageData, 0, 0);
+        // this.canvas.drawBackground('#eeeeee');
 
         // draw the game and any added vfx
         mainController.draw(this.canvas);
@@ -465,6 +471,66 @@ class GameView {
                 this.vfx.splice(i, 1);
             }
         }
+    }
+
+    imageData;
+
+    randomImage(imageData) {
+        var red = 0;
+        var green = 1;
+        var blue = 2;
+        var alpha = 3;
+        var per = 0.5;
+        var value = 220;
+
+        for (var i = 0; i < imageData.data.length; i++) {
+            if (i % 4 === alpha) {
+                imageData.data[i] = 255;
+                // imageData.data[i] = (Math.random() < per) ? value : 0;
+            } else if (i % 4 === red) {
+                imageData.data[i] = (Math.random() < per) ? value : 255;
+                // imageData.data[i] = (Math.random() < per) ? value : 0;
+            } else if (i % 4 === blue) {
+                imageData.data[i] = (Math.random() < per) ? value : 255;
+                // imageData.data[i] = (Math.random() < per) ? value : 0;
+            } else if (i % 4 === green) {
+                imageData.data[i] = (Math.random() < per) ? value : 255;
+            }
+        }
+    }
+
+    stripeWidth = 0;
+
+    cycleStripes(imageData) {
+        var red = 0;
+        var green = 1;
+        var blue = 2;
+        var alpha = 3;
+        // var per = 0.5;
+        // var width = 32;
+        var width = 57;
+        // this.stripeWidth += 0.1;
+        // var width = Math.floor(this.stripeWidth);
+        var lowValue = 220;
+        var highValue = 230;
+
+        for (var i = 0; i < imageData.data.length; i++) {
+            if (i % 4 === alpha) {
+                imageData.data[i] = 255;
+            } else {
+                var amt = Math.floor(i / 4);
+                if (amt % (width * 2) < width) {
+                    imageData.data[i] = lowValue;
+                } else {
+                    imageData.data[i] = highValue;
+                }
+            }
+        }
+
+    }
+
+    makeImageData() {
+        return this.canvas.Graphic.createImageData(gameConfig.canvasWidth, gameConfig.canvasHeight);
     }
 }
 
