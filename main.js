@@ -13,6 +13,8 @@ var autostepper = document.getElementById('auto-stepper');
 var infoblock = document.getElementById('infoblock');
 var undobutton = document.getElementById('undobutton');
 var resetbutton = document.getElementById('resetbutton');
+var zoomOutButton = document.getElementById('zoom-out');
+var zoomInButton = document.getElementById('zoom-in');
 
 function init() {
     // select game type
@@ -25,6 +27,14 @@ function init() {
     stepper.addEventListener("click", () => mainController.stepSequence());
     undobutton.addEventListener("click", () => mainController.undoStep());
     resetbutton.addEventListener("click", () => mainController.reset());
+    zoomOutButton.addEventListener("click", () => {
+        canvasView.radius-= 5;
+        canvasView.setShot();
+    });
+    zoomInButton.addEventListener("click", () => {
+        canvasView.radius+= 5;
+        canvasView.setShot();
+    });
 
     window.addEventListener('keydown', (e) => {
         switch(e.key.toLowerCase()) {
@@ -40,6 +50,8 @@ function init() {
             case '7': mainController.stepSequence(6); break;
             case '8': mainController.stepSequence(7); break;
             case '9': mainController.stepSequence(8); break;
+            case '-': canvasView.radius -= 5; canvasView.setShot(); break;
+            case '=': canvasView.radius += 5; canvasView.setShot(); break;
                 break;
         }
     });
@@ -155,6 +167,8 @@ class MainController {
             this.data = this.historicData.history[this.historicData.history.length - 1];
             if (!this.data) this.setupBoard(layout);
             canvasView.offset = {x: this.historicData.layout.offset.x || 0, y: this.historicData.layout.offset.y || 0};
+            let analysis = this.analysePosition({data: this.data});
+            console.log("A", analysis);
             return;
         } else {
             this.historicData = {
@@ -390,7 +404,10 @@ class GameView {
 
     constructor(canvasElement) {
         this.canvas = new CanvasRender(gameConfig.canvasWidth, gameConfig.canvasHeight, canvasElement);
+        this.setShot();
+    }
 
+    setShot() {
         this.short = this.radius * Math.sin(2 * Math.PI / 6) * 2;
     }
 
@@ -456,8 +473,8 @@ class GameView {
         this.canvas.clear();
         if (!this.imageData) {
             this.imageData = this.makeImageData();
-            this.cycleStripes(this.imageData);
         }
+        this.cycleStripes(this.imageData, this.stripeOffset++);
         
         this.canvas.Graphic.putImageData(this.imageData, 0, 0);
         // this.canvas.drawBackground('#eeeeee');
@@ -500,8 +517,9 @@ class GameView {
     }
 
     stripeWidth = 0;
+    stripeOffset = 0;
 
-    cycleStripes(imageData) {
+    cycleStripes(imageData, offset) {
         var red = 0;
         var green = 1;
         var blue = 2;
@@ -518,7 +536,7 @@ class GameView {
             if (i % 4 === alpha) {
                 imageData.data[i] = 255;
             } else {
-                var amt = Math.floor(i / 4);
+                var amt = Math.floor(i / 4) + offset;
                 if (amt % (width * 2) < width) {
                     imageData.data[i] = lowValue;
                 } else {

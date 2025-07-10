@@ -156,7 +156,7 @@ const StackManager = {
         var count = 0;
 
         data.board.forEach(el => {
-            if (el && el.stack.length === 0) {
+            if (el && el.stack.length === 0 && el.hp >= 0) {
                 count++;
             }
         });
