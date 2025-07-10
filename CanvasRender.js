@@ -46,7 +46,7 @@ class CanvasRender {
             let r = element.getBoundingClientRect();
             
             var x = e.changedTouches[0].pageX * element.width / r.width - r.x;
-            var y = e.changedTouches[0].pageY * element.height / r.height - r.y - 50;
+            var y = e.changedTouches[0].pageY * element.height / r.height - r.y;
 
             var location = {x, y};
             this.onPointerUp && this.onPointerUp(location);
@@ -61,7 +61,7 @@ class CanvasRender {
         element.addEventListener('touchmove', e => {
             let r = element.getBoundingClientRect();
             var x = e.changedTouches[0].pageX * element.width / r.width - r.x;
-            var y = e.changedTouches[0].pageY * element.height / r.height - r.y - 50;
+            var y = e.changedTouches[0].pageY * element.height / r.height - r.y;
             var location = {x, y};
             this.onPointerMove && this.onPointerMove(location);
 

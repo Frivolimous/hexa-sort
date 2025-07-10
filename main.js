@@ -104,6 +104,9 @@ class MainController {
 
             if (this.selectedPointerIndex >= 0) {
                 let offset = 10;
+                if (isMobile) {
+                    offset = 10 - 80;
+                }
                 var loc = canvasView.getTileFromGlobal(e.x, e.y + offset);
 
                 if (e.y < this.paletteY - 100) {
@@ -133,12 +136,15 @@ class MainController {
         }
 
         canvasView.canvas.onPointerMove = (e) => {
-            this.pointerPosition = e;
+            if (isMobile) {
+                this.pointerPosition = {x: e.x, y: e.y - 80};
+            } else {
+                this.pointerPosition = e;
+            }
 
             if (this.draggingBoard) {
                 canvasView.offset.x = e.x - this.draggingBoard.x;
                 canvasView.offset.y = e.y - this.draggingBoard.y;
-                console.log(canvasView.offset);
             }
         }
     }
@@ -149,7 +155,6 @@ class MainController {
             this.data = this.historicData.history[this.historicData.history.length - 1];
             if (!this.data) this.setupBoard(layout);
             canvasView.offset = {x: this.historicData.layout.offset.x || 0, y: this.historicData.layout.offset.y || 0};
-            console.log(canvasView.offset);
             return;
         } else {
             this.historicData = {
@@ -157,7 +162,6 @@ class MainController {
                 history: []
             };
             canvasView.offset = {x: this.historicData.layout.offset.x || 0, y: this.historicData.layout.offset.y || 0};
-            console.log(canvasView.offset);
 
             SaveManager.clearHistoricData();
         }
