@@ -14,6 +14,42 @@ const StackManager = {
         return count;
     },
 
+    layoutToData(layout) {
+        var board = [];
+        var width = 0;
+
+        var cells = layout.board.split(`
+`).map(el => [...el.trim()]);
+        
+        width = cells[0].length;
+        cells.forEach((row, y) => {
+            row.forEach((el, x) => {
+                if (el === '1') {
+                    board[x + y * width] = {lastI: 0, x, y, stack: [], hp: layout.tileHp || 0};
+                }
+            });
+        });
+
+        var data = {board, width, palette: [], paletteSpawnIndex: 0, currentInteraction: 0, score: 0, time: 0};
+
+        layout.stacks.forEach((stack, i) => {
+            if (stack.stack[0] === 'R') {
+                let connections = this.getConnections(data, stack);
+                var numColors = stack.stack[2];
+                var color;
+                var foundColors = connections.map(el => el.stack.length > 0 ? el.stack[el.stack.length - 1] : -1);
+                do {
+                    color = Math.floor(Math.random() * numColors);
+                } while (foundColors.includes(color));
+                for (var i = 0; i < stack.stack[1]; i++) board[stack.x + stack.y * width].stack.push(color);
+            } else {
+                board[stack.x + stack.y * width].stack = stack.stack.map(el => el);
+            }
+        });
+
+        return data;
+    },
+
     getTopIndex(stack) {
         if (stack.length > 0) {
             return stack[stack.length - 1];
@@ -157,6 +193,18 @@ const StackManager = {
 
         data.board.forEach(el => {
             if (el && el.stack.length === 0 && el.hp >= 0) {
+                count++;
+            }
+        });
+
+        return count;
+    },
+
+    numStackedSpots(data) {
+        var count = 0;
+
+        data.board.forEach(el => {
+            if (el && el.stack.length > 0) {
                 count++;
             }
         });
