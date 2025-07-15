@@ -1,10 +1,12 @@
 #main-canvas {
-    width: 300px;
+    max-height: 60vh;
 }
 
 @media (pointer:none), (pointer:coarse) {
     #main-canvas {
+        padding-top: 3em;
         width: 100%;
+        max-height: 100vh;
     }
 
     body {
