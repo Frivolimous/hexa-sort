@@ -47,6 +47,16 @@ class GameView {
         this.canvas.drawHexagon2(this.offset.x + this.left + baseX * this.xx * this.short + baseY * this.yx * this.short,
                                 this.offset.y + (this.top + baseX * this.xy * this.short + baseY * this.yy * this.short) * this.tilt - height * this.heightAmount,
                                 this.radius, 0.7, color, 1, this.tilt);
+    }
+
+    drawTileCap(x, y, height, hp) {
+        if (hp > 0) return;
+        var baseX = x - (y % 2 === 1 ? 0.5 : 0);
+        var baseY = y;
+        var color = '#333333';
+        this.canvas.drawHexagon2(this.offset.x + this.left + baseX * this.xx * this.short + baseY * this.yx * this.short,
+                                this.offset.y + (this.top + baseX * this.xy * this.short + baseY * this.yy * this.short) * this.tilt - height * this.heightAmount,
+                                this.radius * 0.5, 0.5, color, 0.3, this.tilt);
 
     }
 

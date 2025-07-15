@@ -26,7 +26,7 @@ class MainController {
         this.ticker.onTick = this.onTick;
         this.ticker.start();
 
-        this.buttons.push(new ButtonElement('Destroy', 100, 700, 100, 50, button => {
+        this.buttons.push(new ButtonElement('Destroy', 230, 730, 100, 50, button => {
             button.state = 'selected';
             this.nextAction = (e) => {
                 var index = this.getTileIndexFromGlobal(e.x, e.y);
@@ -48,7 +48,7 @@ class MainController {
                 button.state = 'normal';
             }
         }));
-        this.buttons.push(new ButtonElement('AddSpot', 300, 700, 100, 50, button => {
+        this.buttons.push(new ButtonElement('AddSpot', 350, 730, 100, 50, button => {
             button.state = 'selected';
             this.nextAction = (e) => {
                 var index = this.getTileIndexFromGlobal(e.x, e.y, true);
@@ -76,7 +76,7 @@ class MainController {
                 button.state = 'normal';
             }
         }));
-        this.buttons.push(new ButtonElement('Shuffle', 500, 700, 100, 50, button => {
+        this.buttons.push(new ButtonElement('Shuffle', 470, 730, 100, 50, button => {
             StackManager.nextPaletteSet(this.data, this.historicData.layout);
             button.state = 'disabled';
             this.data.powers[2] = 'disabled';
@@ -262,8 +262,17 @@ class MainController {
         data.board.forEach(spot => {
             if (spot) {
                 spot.stack.forEach((color, i) => canvasView.drawTile(spot.x, spot.y, i, Colors.INDEXED[color]));
+                if (spot.stack.length > 0) {
+                    canvasView.drawTileCap(spot.x, spot.y, spot.stack.length, spot.hp);
+                }
             }
         });
+
+        // data.board.forEach(spot => {
+        //     if (spot && spot.stack.length > 0) {
+        //         canvasView.drawTileCap(spot.x, spot.y, spot.stack.length, spot.hp);
+        //     }
+        // })
     }
 
     getTileIndexFromGlobal(x, y, andDead) {
