@@ -26,6 +26,8 @@ const StackManager = {
             row.forEach((el, x) => {
                 if (el === '1') {
                     board[x + y * width] = {lastI: 0, x, y, stack: [], hp: layout.tileHp || 0};
+                } else {
+                    board[x + y * width] = null;
                 }
             });
         });

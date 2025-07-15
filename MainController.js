@@ -20,6 +20,8 @@ class MainController {
 
     buttons = [];
 
+    infoText = null;
+
     nextAction;
 
     constructor() {
@@ -28,8 +30,10 @@ class MainController {
 
         this.buttons.push(new ButtonElement('Destroy', 230, 730, 100, 50, button => {
             button.state = 'selected';
+            this.infoText = 'Tap any stack to destroy it and score it.';
             this.nextAction = (e) => {
                 var index = this.getTileIndexFromGlobal(e.x, e.y);
+                this.infoText = null;
 
                 if (index >= 0) {
                     var tile = this.data.board[index];
@@ -50,8 +54,10 @@ class MainController {
         }));
         this.buttons.push(new ButtonElement('AddSpot', 350, 730, 100, 50, button => {
             button.state = 'selected';
+            this.infoText = 'Tap any empty spot to add a new one.';
             this.nextAction = (e) => {
                 var index = this.getTileIndexFromGlobal(e.x, e.y, true);
+                this.infoText = null;
 
                 if (index >= 0) {
                     var tile = this.data.board[index];
@@ -80,6 +86,8 @@ class MainController {
             StackManager.nextPaletteSet(this.data, this.historicData.layout);
             button.state = 'disabled';
             this.data.powers[2] = 'disabled';
+            this.infoText = 'Palette Randomized!';
+            window.setTimeout(() => this.infoText = null, 1000);
         }));
 
         canvasView.canvas.onPointerDown = (e) => {
@@ -251,6 +259,11 @@ class MainController {
         });
 
         this.buttons.forEach(el => el.draw(canvasView.canvas));
+
+        if (this.infoText) {
+            canvasView.canvas.drawRect(200, 0, 400, 100, '#ffff99');
+            canvasView.canvas.addText(205, 30, this.infoText, 22, '#000000');
+        }
     }
 
     drawFromData(data) {
@@ -267,12 +280,6 @@ class MainController {
                 }
             }
         });
-
-        // data.board.forEach(spot => {
-        //     if (spot && spot.stack.length > 0) {
-        //         canvasView.drawTileCap(spot.x, spot.y, spot.stack.length, spot.hp);
-        //     }
-        // })
     }
 
     getTileIndexFromGlobal(x, y, andDead) {
