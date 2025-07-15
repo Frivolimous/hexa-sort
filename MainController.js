@@ -18,12 +18,86 @@ class MainController {
     autoStepDelay = 500;
     autoStepCount = 0;
 
+    buttons = [];
+
+    nextAction;
+
     constructor() {
         this.ticker.onTick = this.onTick;
         this.ticker.start();
 
+        this.buttons.push(new ButtonElement('Destroy', 100, 700, 100, 50, button => {
+            button.state = 'selected';
+            this.nextAction = (e) => {
+                var index = this.getTileIndexFromGlobal(e.x, e.y);
+
+                if (index >= 0) {
+                    var tile = this.data.board[index];
+                    console.log(tile);
+    
+                    if (tile && tile.stack.length > 0) {
+                        this.setupDataChange();
+                        this.data.score += tile.stack.length;
+                        tile.stack = [];
+                        button.state = 'disabled';
+                        this.data.powers[0] = 'disabled';
+                        return;
+                    }
+                }
+
+                button.state = 'normal';
+            }
+        }));
+        this.buttons.push(new ButtonElement('AddSpot', 300, 700, 100, 50, button => {
+            button.state = 'selected';
+            this.nextAction = (e) => {
+                var index = this.getTileIndexFromGlobal(e.x, e.y, true);
+
+                if (index >= 0) {
+                    var tile = this.data.board[index];
+                    console.log(tile);
+
+                    if (!tile) {
+                        this.setupDataChange();
+                        var loc = canvasView.getTileFromGlobal(e.x, e.y);
+                        this.data.board[index] = {lastI: 0, x: loc.x, y: loc.y, stack: [], hp: this.historicData.layout.tileHp || 0};
+                        button.state = 'disabled';
+                        this.data.powers[1] = 'disabled';
+                        return;
+                    } else if (tile.stack.length === 0 && tile.hp < 2) {
+                        this.setupDataChange();
+                        tile.hp = 2;
+                        button.state = 'disabled';
+                        this.data.powers[1] = 'disabled';
+                        return;
+                    }
+                }
+
+                button.state = 'normal';
+            }
+        }));
+        this.buttons.push(new ButtonElement('Shuffle', 500, 700, 100, 50, button => {
+            StackManager.nextPaletteSet(this.data, this.historicData.layout);
+            button.state = 'disabled';
+            this.data.powers[2] = 'disabled';
+        }));
+
         canvasView.canvas.onPointerDown = (e) => {
+            if (this.nextAction) {
+                this.nextAction(e);
+                this.nextAction = null;
+                return;
+            }
+
             this.pointerPosition = e;
+
+            for (var i = 0; i < this.buttons.length; i++) {
+                if (this.buttons[i].hitTest(e)) {
+                    this.buttons[i].onClick();
+                    return;
+                }
+            }
+
             if (Math.abs(this.paletteY - e.y) < 100) {
                 let x = Math.round((e.x - this.paletteLeft) / this.paletteP);
 
@@ -45,27 +119,23 @@ class MainController {
                 if (isMobile) {
                     offset = 10 - 80;
                 }
-                var loc = canvasView.getTileFromGlobal(e.x, e.y + offset);
 
-                if (e.y < this.paletteY - 100) {
-                    if (loc.x >= 0 && loc.y < this.data.width && loc.y >= 0) {
-                        var index = loc.x + loc.y * this.data.width;
-                        if (index < this.data.board.length && this.data.board[index].hp >= 0) {                        
-                            if (this.data.board[index] && this.data.board[index].stack.length === 0) {
-                                this.historicData.history.push(this.data);
-                                SaveManager.saveHistoricData(this.historicData);
-                                this.data = StackManager.cloneData(this.data);
-
-                                if (this.data.board[index].hp > 0) {
-                                    if (this.data.board[index].hp === 1) {
-                                        this.data.board[index].hp = -1;
-                                    } else {
-                                        this.data.board[index].hp--;
-                                    }
-                                }
-                                StackManager.placeFromPalette(this.data, index, this.selectedPointerIndex, this.historicData.layout);
+                var index = this.getTileIndexFromGlobal(e.x, e.y + offset);
+                console.log(index);
+                if (index >= 0) {
+                    var tile = this.data.board[index];
+    
+                    if (tile && tile.stack.length === 0) {
+                        this.setupDataChange();
+    
+                        if (tile.hp > 0) {
+                            if (tile.hp === 1) {
+                                tile.hp = -1;
+                            } else {
+                                tile.hp--;
                             }
                         }
+                        StackManager.placeFromPalette(this.data, index, this.selectedPointerIndex, this.historicData.layout);
                     }
                 }
 
@@ -90,7 +160,7 @@ class MainController {
     setupBoard(layout, historicData) {
         if (historicData) {
             this.historicData = historicData;
-            this.data = this.historicData.history[this.historicData.history.length - 1];
+            this.data = StackManager.cloneData(this.historicData.history[this.historicData.history.length - 1]);
             if (!this.data) this.setupBoard(layout);
             canvasView.offset = {x: this.historicData.layout.offset.x || 0, y: this.historicData.layout.offset.y || 0};
             canvasView.radius = this.historicData.layout.startingRadius || 50;
@@ -98,6 +168,10 @@ class MainController {
             this.paletteLeft = gameConfig.canvasWidth / 2 - ((this.historicData.layout.numPalette - 1) / 2) * this.paletteP;
 
             let analysis = this.analysePosition({data: this.data});
+
+            this.buttons.forEach((button, i) => {
+                button.state = this.data.powers[i];
+            });
             console.log("load state", analysis);
             return;   
         }
@@ -113,8 +187,13 @@ class MainController {
 
         SaveManager.clearHistoricData();
 
-
         this.data = StackManager.layoutToData(layout);
+
+        this.buttons.forEach((button, i) => {
+            button.state = this.data.powers[i];
+        });
+
+
         StackManager.nextPaletteSet(this.data, this.historicData.layout);
         var analysis = this.analysePosition({data: this.data});
         console.log("initial state", analysis);
@@ -127,7 +206,10 @@ class MainController {
     }
 
     undoStep = () => {
-        if (this.historicData.history.length > 0) this.data = this.historicData.history.pop();
+        if (this.historicData.history.length > 0) this.data = StackManager.cloneData(this.historicData.history.pop());
+        this.buttons.forEach((button, i) => {
+            button.state = this.data.powers[i];
+        });
         SaveManager.saveHistoricData(this.historicData);
     }
 
@@ -167,6 +249,8 @@ class MainController {
                 });
             }
         });
+
+        this.buttons.forEach(el => el.draw(canvasView.canvas));
     }
 
     drawFromData(data) {
@@ -182,6 +266,22 @@ class MainController {
         });
     }
 
+    getTileIndexFromGlobal(x, y, andDead) {
+        if (y > this.paletteY - 100) return -1;
+
+        var loc = canvasView.getTileFromGlobal(x, y);
+        if (loc.x < 0 || loc.x >= this.data.width || loc.y < 0) return -1;
+
+        var index = loc.x + loc.y * this.data.width;
+        if (index >= this.data.board.length || (!andDead && !this.data.board[index]) || (!andDead && this.data.board[index].hp < 0)) return -1;
+        return index;
+    }
+
+    setupDataChange() {
+        this.historicData.history.push(StackManager.cloneData(this.data));
+        SaveManager.saveHistoricData(this.historicData);
+    }
+
     /////
 
     canStep() {
@@ -190,7 +290,6 @@ class MainController {
 
     stepSequence = (i = 0) => {
         var groups = StackManager.findAllGroups(this.data);
-        // console.log(groups);
         if (groups.length > 0) {
             this.resolveGroups(i);
         } else {
@@ -252,9 +351,8 @@ class MainController {
             if (b.analysis.proximityToLastStack > a.analysis.proximityToLastStack) return 1;
         });
 
-        this.historicData.history.push(this.data);
-        SaveManager.saveHistoricData(this.historicData);
         if (closed.length > 0) {
+            this.setupDataChange();
             this.data = StackManager.cloneData(closed[Math.min(closed.length -1, finalIndex)].analysis.path[1].data);
         }
 
@@ -296,5 +394,35 @@ class MainController {
         
         txt += `<br>Time: ${makeTimeString(this.data.time)}`;
         infoblock.innerHTML = txt;
+    }
+}
+
+
+class ButtonElement {
+    x;
+    y;
+    width;
+    height;
+    callback;
+    text;
+    state = 'normal';
+
+    constructor(text, x, y, width, height, callback) {
+        this.text = text;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.callback = callback;
+    }
+
+    hitTest = (loc) => loc.x > this.x && loc.x < (this.x + this.width) && loc.y > this.y && loc.y < (this.y + this.width);
+    onClick = () => this.state !== 'disabled' && this.callback && this.callback(this);
+
+    draw(canvas) {
+        var color;
+        color = this.state === 'normal' ? '#ffeeaa' : this.state === 'selected' ? '#aaffff' : '#aaaaaa';
+        canvas.drawRect(this.x, this.y, this.width, this.height, color, '#000000');
+        canvas.addText(this.x + 5, this.y + this.height / 2 + 5, this.text, 25);
     }
 }

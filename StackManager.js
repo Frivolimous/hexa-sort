@@ -30,7 +30,7 @@ const StackManager = {
             });
         });
 
-        var data = {board, width, palette: [], paletteSpawnIndex: 0, currentInteraction: 0, score: 0, time: 0};
+        var data = {board, width, palette: [], paletteSpawnIndex: 0, currentInteraction: 0, score: 0, time: 0, powers: ['normal', 'normal', 'normal']};
 
         layout.stacks.forEach((stack, i) => {
             if (stack.stack[0] === 'R') {
@@ -258,7 +258,9 @@ const StackManager = {
             return stack.map(el => el);
         })
 
-        return {board, width, palette, paletteSpawnIndex: data.paletteSpawnIndex, currentInteraction: data.currentInteraction, score: data.score, time: data.time};
+        let powers = data.powers ? data.powers.map(el => el) : ['disabled', 'disabled', 'disabled'];
+
+        return {board, width, palette, paletteSpawnIndex: data.paletteSpawnIndex, currentInteraction: data.currentInteraction, score: data.score, time: data.time, powers};
     },
 
     placeFromPalette(data, boardIndex, paletteIndex, layout) {
