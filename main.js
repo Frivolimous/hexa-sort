@@ -56,12 +56,12 @@ function init() {
         }
     });
 
-    addInteractionButton('Basic Hex', 0);
+    addInteractionButton('Small Unlimited', 0);
     // addInteractionButton('TestReplay', 1);
-    addInteractionButton('SmallerBoard', 2);
-    addInteractionButton('GiantLimitedBoard', 3);
-    addInteractionButton('GiantLimitedPopulated', 4);
-    addInteractionButton('BigLimitedPopulated', 6);
+    addInteractionButton('Smaller Unlimited', 2);
+    // addInteractionButton('GiantLimitedBoard', 3);
+    addInteractionButton('Big Board', 6);
+    addInteractionButton('Giant Board', 4);
     let data = SaveManager.loadHistoricData();
     mainController.setupBoard(layouts[gameConfig.defaultLayout], data);
 }
