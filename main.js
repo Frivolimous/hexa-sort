@@ -56,12 +56,12 @@ function init() {
         }
     });
 
-    layouts.forEach((el, i) => {
-        if (el.active) {
-            addInteractionButton(el.name, i);
-        }
-    });
-    
+    addInteractionButton('Basic Hex', 0);
+    // addInteractionButton('TestReplay', 1);
+    addInteractionButton('SmallerBoard', 2);
+    addInteractionButton('GiantLimitedBoard', 3);
+    addInteractionButton('GiantLimitedPopulated', 4);
+    addInteractionButton('BigLimitedPopulated', 6);
     let data = SaveManager.loadHistoricData();
     mainController.setupBoard(layouts[gameConfig.defaultLayout], data);
 }
