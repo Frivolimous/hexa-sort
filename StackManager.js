@@ -1,4 +1,6 @@
 const StackManager = {
+    randomizer: fakeRandomizer,
+
     countTopColor(stack) {
         let color = stack[stack.length - 1];
         var count = 0;
@@ -32,7 +34,7 @@ const StackManager = {
             });
         });
 
-        var data = {board, width, palette: [], paletteSpawnIndex: 0, currentInteraction: 0, score: 0, time: 0, powers: ['normal', 'normal', 'normal']};
+        var data = {board, width, palette: [], paletteSpawnIndex: 0, currentInteraction: 0, score: 0, time: 0, powers: ['normal', 'normal', 'normal'], randomIndex: 1};
 
         layout.stacks.forEach((stack, i) => {
             if (stack.stack[0] === 'R') {
@@ -41,13 +43,15 @@ const StackManager = {
                 var color;
                 var foundColors = connections.map(el => el.stack.length > 0 ? el.stack[el.stack.length - 1] : -1);
                 do {
-                    color = Math.floor(Math.random() * numColors);
+                    color = Math.floor(StackManager.randomizer.next() * numColors);
                 } while (foundColors.includes(color));
                 for (var i = 0; i < stack.stack[1]; i++) board[stack.x + stack.y * width].stack.push(color);
             } else {
                 board[stack.x + stack.y * width].stack = stack.stack.map(el => el);
             }
         });
+
+        StackManager.nextPaletteSet(data, layout);
 
         return data;
     },
@@ -262,7 +266,7 @@ const StackManager = {
 
         let powers = data.powers ? data.powers.map(el => el) : ['disabled', 'disabled', 'disabled'];
 
-        return {board, width, palette, paletteSpawnIndex: data.paletteSpawnIndex, currentInteraction: data.currentInteraction, score: data.score, time: data.time, powers};
+        return {board, width, palette, paletteSpawnIndex: data.paletteSpawnIndex, currentInteraction: data.currentInteraction, score: data.score, time: data.time, powers, randomIndex: data.randomIndex};
     },
 
     placeFromPalette(data, boardIndex, paletteIndex, layout) {
@@ -279,6 +283,7 @@ const StackManager = {
         });
 
         if (paletteClear) {
+            console.log('clear');
             StackManager.nextPaletteSet(data, layout);
         }
     },
@@ -313,19 +318,19 @@ const StackManager = {
         let colors = [-1, -1, -1];
 
         
-        colors[0] = Math.floor(Math.random() * (maxColor + 1));
+        colors[0] = Math.floor(StackManager.randomizer.next() * (maxColor + 1));
         if (count > 1) {
-            counts[0] = Math.ceil(Math.random() * (total - count + 1));
+            counts[0] = Math.ceil(StackManager.randomizer.next() * (total - count + 1));
         } else {
             counts[0] = total;
         }
 
         if (count >= 2) {
             do {
-                colors[1] = Math.floor(Math.random() * (maxColor + 1));
+                colors[1] = Math.floor(StackManager.randomizer.next() * (maxColor + 1));
             } while (colors[1] === colors[0]);
             if (count > 2) {
-                counts[1] = Math.ceil(Math.random() * (total - counts[0] - count + 2));
+                counts[1] = Math.ceil(StackManager.randomizer.next() * (total - counts[0] - count + 2));
             } else {
                 counts[1] = total - counts[0];
             }
@@ -333,7 +338,7 @@ const StackManager = {
 
         if (count === 3) {
             do {
-                colors[2] = Math.floor(Math.random() * (maxColor + 1));
+                colors[2] = Math.floor(StackManager.randomizer.next() * (maxColor + 1));
             } while (colors[2] === colors[0] || colors[2] === colors[1]);
 
             counts[2] = total - counts[0] - counts[1];
@@ -353,11 +358,11 @@ const StackManager = {
     getRandomTotalSize(paletteSpawnIndex) {
         var min = Math.min(4, Math.floor(paletteSpawnIndex / 20) + 2);
         var max = 6;
-        return min + Math.floor(Math.random() * (max + 1 - min));
+        return min + Math.floor(StackManager.randomizer.next() * (max + 1 - min));
     },
 
     getRandomNumColors(paletteSpawnIndex, stackSize) {
-        return Math.min(stackSize, 3, Math.ceil(Math.random() * (2 + paletteSpawnIndex / 20)));
+        return Math.min(stackSize, 3, Math.ceil(StackManager.randomizer.next() * (2 + paletteSpawnIndex / 20)));
     },
 
     getMaxColorIndex(paletteSpawnIndex) {

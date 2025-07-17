@@ -22,6 +22,10 @@ class MainController {
 
     infoText = null;
 
+    tileDraw = false;
+    drawing = false;
+    erasing = false;
+
     nextAction;
 
     constructor() {
@@ -91,6 +95,22 @@ class MainController {
         }));
 
         canvasView.canvas.onPointerDown = (e) => {
+            if (this.tileDraw) {
+                var index = this.getTileIndexFromGlobal(e.x, e.y + 20, true);
+                if (index >= 0) {
+                    if (this.data.board[index]) {
+                        this.erasing = true;
+                        this.data.board[index] = null;
+                    } else {
+                        this.drawing = true;
+                        var loc = canvasView.getTileFromGlobal(e.x, e.y + 20);
+                        this.data.board[index] = {lastI: 0, x: loc.x, y: loc.y, stack: [], hp: this.historicData.layout.tileHp || 0};
+                    }
+                }
+
+                return;
+            }
+
             if (this.nextAction) {
                 this.nextAction(e);
                 this.nextAction = null;
@@ -121,6 +141,26 @@ class MainController {
 
         canvasView.canvas.onPointerUp = (e) => {
             this.draggingBoard = null;
+            if (this.drawing || this.erasing) {
+                var str = '';
+                var count = 0;
+                var connections = 0;
+                this.data.board.forEach((el, i) => {
+                    if (i % this.data.width === 0) str += `
+                `;
+                    str += el ? '1' : '0';
+                    count += el ? 1 : 0;
+                    if (el) {
+                        var c = StackManager.getConnections(this.data, el);
+                        connections += c.length / 2;
+                    }
+                });
+
+                console.log(str);
+                console.log(count, connections);
+            }
+            this.drawing = false;
+            this.erasing = false;
 
             if (this.selectedPointerIndex >= 0) {
                 let offset = 10;
@@ -152,6 +192,31 @@ class MainController {
         }
 
         canvasView.canvas.onPointerMove = (e) => {
+            if (this.drawing) {
+                var index = this.getTileIndexFromGlobal(e.x, e.y + 20, true);
+                if (index >= 0) {
+                    if (!this.data.board[index]) {
+                        this.drawing = true;
+                        var loc = canvasView.getTileFromGlobal(e.x, e.y + 20);
+                        this.data.board[index] = {lastI: 0, x: loc.x, y: loc.y, stack: [], hp: this.historicData.layout.tileHp || 0};
+                    }
+                }
+
+                return;
+            }
+
+            if (this.erasing) {
+                var index = this.getTileIndexFromGlobal(e.x, e.y + 20, true);
+                if (index >= 0) {
+                    if (this.data.board[index]) {
+                        this.erasing = true;
+                        this.data.board[index] = null;
+                    }
+                }
+
+                return;
+            }
+
             if (isMobile) {
                 this.pointerPosition = {x: e.x, y: e.y - 80};
             } else {
@@ -168,43 +233,46 @@ class MainController {
     setupBoard(layout, historicData) {
         if (historicData) {
             this.historicData = historicData;
+            layout = this.historicData.layout;
             this.data = StackManager.cloneData(this.historicData.history[this.historicData.history.length - 1]);
-            if (!this.data) this.setupBoard(layout);
-            canvasView.offset = {x: this.historicData.layout.offset.x || 0, y: this.historicData.layout.offset.y || 0};
-            canvasView.radius = this.historicData.layout.startingRadius || 50;
-            canvasView.setShot();
-            this.paletteLeft = gameConfig.canvasWidth / 2 - ((this.historicData.layout.numPalette - 1) / 2) * this.paletteP;
+            if (!this.data) {
+                this.setupBoard(layout);
+                return;
+            }
 
-            let analysis = this.analysePosition({data: this.data});
-
-            this.buttons.forEach((button, i) => {
-                button.state = this.data.powers[i];
-            });
-            console.log("load state", analysis);
-            return;   
+            if (layout.randomizer) {
+                StackManager.randomizer = new Randomizer(layout.randomizer.inc, layout.randomizer.div, this.data.randomIndex);
+            } else {
+                StackManager.randomizer = fakeRandomizer;
+            }
+        } else {
+            this.historicData = {
+                layout,
+                history: []
+            };
+    
+            SaveManager.clearHistoricData();
+    
+            if (layout.randomizer) {
+                    StackManager.randomizer = new Randomizer(layout.randomizer.inc, layout.randomizer.div, layout.start);
+            } else {
+                StackManager.randomizer = fakeRandomizer;
+            }
+            this.data = StackManager.layoutToData(layout);
         }
 
-        this.historicData = {
-            layout,
-            history: []
-        };
-        canvasView.offset = {x: this.historicData.layout.offset.x || 0, y: this.historicData.layout.offset.y || 0};
+        canvasView.offset = {x: layout.offset.x || 0, y: layout.offset.y || 0};
         canvasView.radius = layout.startingRadius || 50;
         canvasView.setShot();
         this.paletteLeft = gameConfig.canvasWidth / 2 - ((layout.numPalette - 1) / 2) * this.paletteP;
-
-        SaveManager.clearHistoricData();
-
-        this.data = StackManager.layoutToData(layout);
-
+        
+        
         this.buttons.forEach((button, i) => {
             button.state = this.data.powers[i];
         });
 
-
-        StackManager.nextPaletteSet(this.data, this.historicData.layout);
-        var analysis = this.analysePosition({data: this.data});
-        console.log("initial state", analysis);
+        let analysis = this.analysePosition({data: this.data});
+        console.log("starting state: ", analysis);
     }
 
     reset = () => {
@@ -215,6 +283,8 @@ class MainController {
 
     undoStep = () => {
         if (this.historicData.history.length > 0) this.data = StackManager.cloneData(this.historicData.history.pop());
+        StackManager.randomizer.i = this.data.randomIndex;
+        console.log('r', this.data.randomIndex);
         this.buttons.forEach((button, i) => {
             button.state = this.data.powers[i];
         });
@@ -294,6 +364,8 @@ class MainController {
     }
 
     setupDataChange() {
+        this.data.randomIndex = StackManager.randomizer.i;
+        console.log('r2', this.data.randomIndex);
         this.historicData.history.push(StackManager.cloneData(this.data));
         SaveManager.saveHistoricData(this.historicData);
     }

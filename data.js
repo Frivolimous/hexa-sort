@@ -3,7 +3,7 @@ const gameConfig = {
     canvasWidth: 800,
     canvasHeight: 800,
 
-    defaultLayout: 6,
+    defaultLayout: 8,
 }
 
 const layouts = [
@@ -19,6 +19,8 @@ const layouts = [
         ],
         numPalette: 3,
         offset: {x: 100, y: -70},
+        active: true,
+        name: 'Small Unlimited'
     },
     {
         board: `01111100
@@ -104,6 +106,9 @@ const layouts = [
         stacks: [],
         numPalette: 3,
         offset: {x: 100, y: -70},
+        active: true,
+        name: 'Smaller Unlimited'
+
     },
     {
         board: `000000000000
@@ -124,6 +129,88 @@ const layouts = [
         offset: {x: 100, y: -140},
     },
     {
+        board: `0000000000
+                0011111100
+                0111111100
+                0111111110
+                1111111110
+                0111111110
+                0111111100
+                0011111100
+                0000000000`,
+        offset: {x: 100, y: -120},
+        startingRadius: 40, 
+        stacks: [
+            // {x: 0, y: 1, stack: ['R', 3, 8]},
+            {x: 2, y: 1, stack: ['R', 3, 8]},
+            {x: 3, y: 1, stack: ['R', 3, 8]},
+            {x: 4, y: 1, stack: ['R', 3, 8]},
+            {x: 5, y: 1, stack: ['R', 3, 8]},
+            {x: 6, y: 1, stack: ['R', 3, 8]},
+            {x: 7, y: 1, stack: ['R', 3, 8]},
+            // {x: 7, y: 1, stack: ['R', 3, 8]},
+            // {x: 8, y: 1, stack: ['R', 3, 8]},
+            // {x: 0, y: 2, stack: ['R', 3, 8]},
+            {x: 1, y: 2, stack: ['R', 3, 8]},
+            {x: 2, y: 2, stack: ['R', 9, 8]},
+            {x: 3, y: 2, stack: ['R', 9, 8]},
+            {x: 4, y: 2, stack: ['R', 3, 8]},
+            {x: 5, y: 2, stack: ['R', 9, 8]},
+            {x: 6, y: 2, stack: ['R', 9, 8]},
+            {x: 7, y: 2, stack: ['R', 3, 8]},
+            // {x: 8, y: 2, stack: ['R', 3, 8]},
+            {x: 1, y: 3, stack: ['R', 3, 7]},
+            {x: 2, y: 3, stack: ['R', 3, 7]},
+            {x: 3, y: 3, stack: ['R', 9, 7]},
+            {x: 4, y: 3, stack: ['R', 3, 7]},
+            {x: 5, y: 3, stack: ['R', 3, 7]},
+            {x: 6, y: 3, stack: ['R', 9, 7]},
+            {x: 7, y: 3, stack: ['R', 3, 7]},
+            {x: 8, y: 3, stack: ['R', 3, 7]},
+            // {x: 8, y: 3, stack: ['R', 3, 8]},
+            {x: 0, y: 4, stack: ['R', 3, 6]},
+            {x: 1, y: 4, stack: ['R', 3, 6]},
+            {x: 2, y: 4, stack: ['R', 3, 6]},
+            {x: 3, y: 4, stack: ['R', 3, 6]},
+            {x: 4, y: 4, stack: ['R', 3, 6]},
+            {x: 5, y: 4, stack: ['R', 3, 6]},
+            {x: 6, y: 4, stack: ['R', 3, 6]},
+            {x: 7, y: 4, stack: ['R', 3, 6]},
+            {x: 8, y: 4, stack: ['R', 3, 6]},
+            {x: 1, y: 5, stack: ['R', 3, 4]},
+            {x: 2, y: 5, stack: ['R', 3, 4]},
+            {x: 3, y: 5, stack: ['R', 3, 4]},
+            {x: 4, y: 5, stack: ['R', 3, 4]},
+            {x: 5, y: 5, stack: ['R', 3, 4]},
+            {x: 6, y: 5, stack: ['R', 3, 4]},
+            {x: 7, y: 5, stack: ['R', 3, 4]},
+            {x: 8, y: 5, stack: ['R', 3, 4]},
+            // {x: 8, y: 5, stack: ['R', 3, 8]},
+            // {x: 0, y: 6, stack: ['R', 3, 8]},
+            {x: 1, y: 6, stack: ['R', 3, 4]},
+            {x: 2, y: 6, stack: ['R', 3, 4]},
+            // {x: 3, y: 6, stack: ['R', 3, 8]},
+            // {x: 4, y: 6, stack: ['R', 3, 8]},
+            // {x: 5, y: 6, stack: ['R', 3, 8]},
+            {x: 6, y: 6, stack: ['R', 3, 4]},
+            {x: 7, y: 6, stack: ['R', 3, 4]},
+            // {x: 8, y: 6, stack: ['R', 3, 8]},
+            // {x: 0, y: 7, stack: ['R', 3, 8]},
+            {x: 2, y: 7, stack: ['R', 3, 3]},
+            // {x: 2, y: 7, stack: ['R', 3, 8]},
+            // {x: 3, y: 7, stack: ['R', 3, 8]},
+            // {x: 4, y: 7, stack: ['R', 3, 8]},
+            // {x: 5, y: 7, stack: ['R', 3, 8]},
+            {x: 7, y: 7, stack: ['R', 3, 3]},
+            // {x: 7, y: 7, stack: ['R', 3, 8]},
+            // {x: 8, y: 7, stack: ['R', 3, 8]},
+        ],
+        tileHp: 2,
+        numPalette: 3,
+        active: true,
+        name: 'Big Board'
+    },
+    {
         board: `000000000000
                 000111111000
                 001111111000
@@ -135,14 +222,6 @@ const layouts = [
                 001111111000
                 000000000000`,
 
-        // board: `0011111100
-        //         0011111110
-        //         0111111110
-        //         0111111111
-        //         1111111111
-        //         0111111111
-        //         0111111110
-        //         0011111110`,
         startingRadius: 35,
         offset: {x: 100, y: -140},
         stacks: [
@@ -228,7 +307,10 @@ const layouts = [
             // {x: 9, y: 8, stack: ['R', 3, 8]},
         ],
         tileHp: 2,
-        numPalette: 4
+        numPalette: 4,
+        active: true,
+        name: 'Bigger Board'
+
     },
     {
         board: `0011111100
@@ -337,7 +419,7 @@ const layouts = [
                 0000000000`,
         offset: {x: 100, y: -120},
         startingRadius: 40, 
-        stacks: [
+        stacks: [[
             // {x: 0, y: 1, stack: ['R', 3, 8]},
             {x: 2, y: 1, stack: ['R', 3, 8]},
             {x: 3, y: 1, stack: ['R', 3, 8]},
@@ -401,9 +483,109 @@ const layouts = [
             {x: 7, y: 7, stack: ['R', 3, 3]},
             // {x: 7, y: 7, stack: ['R', 3, 8]},
             // {x: 8, y: 7, stack: ['R', 3, 8]},
+        ]],
+        tileHp: 2,
+        numPalette: 3,
+        active: true,
+        name: 'Single Seed',
+        randomizer: {
+            inc: 27457,
+            div: 1787,
+            start: 1
+        },
+    },
+        {
+        board: `000000000000
+                000000100000
+                000001100000
+                000001110000
+                011111111110
+                001111011110
+                001100001100
+                000110001100
+                001100001100
+                001111011110
+                011111111110
+                000001110000
+                000001100000
+                000000100000
+                000000000000`,
+        offset: {x: 100, y: -200},
+        startingRadius: 30,
+        stacks: [
+            // // {x: 0, y: 1, stack: ['R', 3, 8]},
+            // {x: 2, y: 1, stack: ['R', 3, 8]},
+            // {x: 3, y: 1, stack: ['R', 3, 8]},
+            // {x: 4, y: 1, stack: ['R', 3, 8]},
+            // {x: 5, y: 1, stack: ['R', 3, 8]},
+            // {x: 6, y: 1, stack: ['R', 3, 8]},
+            // {x: 7, y: 1, stack: ['R', 3, 8]},
+            // // {x: 7, y: 1, stack: ['R', 3, 8]},
+            // // {x: 8, y: 1, stack: ['R', 3, 8]},
+            // // {x: 0, y: 2, stack: ['R', 3, 8]},
+            // {x: 1, y: 2, stack: ['R', 3, 8]},
+            // {x: 2, y: 2, stack: ['R', 9, 8]},
+            // {x: 3, y: 2, stack: ['R', 9, 8]},
+            // {x: 4, y: 2, stack: ['R', 3, 8]},
+            // {x: 5, y: 2, stack: ['R', 9, 8]},
+            // {x: 6, y: 2, stack: ['R', 9, 8]},
+            // {x: 7, y: 2, stack: ['R', 3, 8]},
+            // // {x: 8, y: 2, stack: ['R', 3, 8]},
+            // {x: 1, y: 3, stack: ['R', 3, 7]},
+            // {x: 2, y: 3, stack: ['R', 3, 7]},
+            // {x: 3, y: 3, stack: ['R', 9, 7]},
+            // {x: 4, y: 3, stack: ['R', 3, 7]},
+            // {x: 5, y: 3, stack: ['R', 3, 7]},
+            // {x: 6, y: 3, stack: ['R', 9, 7]},
+            // {x: 7, y: 3, stack: ['R', 3, 7]},
+            // {x: 8, y: 3, stack: ['R', 3, 7]},
+            // // {x: 8, y: 3, stack: ['R', 3, 8]},
+            // {x: 0, y: 4, stack: ['R', 3, 6]},
+            // {x: 1, y: 4, stack: ['R', 3, 6]},
+            // {x: 2, y: 4, stack: ['R', 3, 6]},
+            // {x: 3, y: 4, stack: ['R', 3, 6]},
+            // {x: 4, y: 4, stack: ['R', 3, 6]},
+            // {x: 5, y: 4, stack: ['R', 3, 6]},
+            // {x: 6, y: 4, stack: ['R', 3, 6]},
+            // {x: 7, y: 4, stack: ['R', 3, 6]},
+            // {x: 8, y: 4, stack: ['R', 3, 6]},
+            // {x: 1, y: 5, stack: ['R', 3, 4]},
+            // {x: 2, y: 5, stack: ['R', 3, 4]},
+            // {x: 3, y: 5, stack: ['R', 3, 4]},
+            // {x: 4, y: 5, stack: ['R', 3, 4]},
+            // {x: 5, y: 5, stack: ['R', 3, 4]},
+            // {x: 6, y: 5, stack: ['R', 3, 4]},
+            // {x: 7, y: 5, stack: ['R', 3, 4]},
+            // {x: 8, y: 5, stack: ['R', 3, 4]},
+            // // {x: 8, y: 5, stack: ['R', 3, 8]},
+            // // {x: 0, y: 6, stack: ['R', 3, 8]},
+            // {x: 1, y: 6, stack: ['R', 3, 4]},
+            // {x: 2, y: 6, stack: ['R', 3, 4]},
+            // // {x: 3, y: 6, stack: ['R', 3, 8]},
+            // // {x: 4, y: 6, stack: ['R', 3, 8]},
+            // // {x: 5, y: 6, stack: ['R', 3, 8]},
+            // {x: 6, y: 6, stack: ['R', 3, 4]},
+            // {x: 7, y: 6, stack: ['R', 3, 4]},
+            // // {x: 8, y: 6, stack: ['R', 3, 8]},
+            // // {x: 0, y: 7, stack: ['R', 3, 8]},
+            // {x: 2, y: 7, stack: ['R', 3, 3]},
+            // // {x: 2, y: 7, stack: ['R', 3, 8]},
+            // // {x: 3, y: 7, stack: ['R', 3, 8]},
+            // // {x: 4, y: 7, stack: ['R', 3, 8]},
+            // // {x: 5, y: 7, stack: ['R', 3, 8]},
+            // {x: 7, y: 7, stack: ['R', 3, 3]},
+            // // {x: 7, y: 7, stack: ['R', 3, 8]},
+            // // {x: 8, y: 7, stack: ['R', 3, 8]},
         ],
         tileHp: 2,
-        numPalette: 3
+        numPalette: 3,
+        active: true,
+        name: 'Board Test',
+        randomizer: {
+            inc: 27457,
+            div: 1787,
+            start: 1
+        },
     },
 ];
 

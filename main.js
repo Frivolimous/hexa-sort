@@ -52,16 +52,17 @@ function init() {
             case '9': mainController.stepSequence(8); break;
             case '-': canvasView.radius -= 5; canvasView.setShot(); break;
             case '=': canvasView.radius += 5; canvasView.setShot(); break;
+            case 't': mainController.tileDraw = !mainController.tileDraw; break;
                 break;
         }
     });
 
-    addInteractionButton('Small Unlimited', 0);
-    // addInteractionButton('TestReplay', 1);
-    addInteractionButton('Smaller Unlimited', 2);
-    // addInteractionButton('GiantLimitedBoard', 3);
-    addInteractionButton('Big Board', 6);
-    addInteractionButton('Giant Board', 4);
+    layouts.forEach((el, i) => {
+        if (el.active) {
+            addInteractionButton(el.name, i);
+        }
+    })
+
     let data = SaveManager.loadHistoricData();
     mainController.setupBoard(layouts[gameConfig.defaultLayout], data);
 }

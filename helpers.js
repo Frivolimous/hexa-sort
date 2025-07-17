@@ -187,3 +187,36 @@ const SaveManager = {
         window.localStorage.setItem('HexHistoricData', undefined);
     },
 }
+
+function makeRandomGenerator(inc, div, start = 1) {
+    var i = start;
+
+    return [() => {
+        i++;
+        
+        return ((i * inc)%div) / div;
+    }, () => i];
+}
+
+class Randomizer {
+    inc;
+    div;
+    i;
+
+    constructor(inc, div, start = 1) {
+        this.inc = inc;
+        this.div = div;
+        this.i = start;
+    }
+
+    next() {
+        this.i++;
+
+        return ((this.i * this.inc) % this.div) / this.div;
+    }
+}
+
+var fakeRandomizer = {
+    i: 1,
+    next: Math.random,
+}
