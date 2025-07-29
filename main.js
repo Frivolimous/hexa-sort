@@ -52,7 +52,7 @@ function init() {
             case '9': mainController.stepSequence(8); break;
             case '-': canvasView.radius -= 5; canvasView.setShot(); break;
             case '=': canvasView.radius += 5; canvasView.setShot(); break;
-            case 't': mainController.tileDraw = !mainController.tileDraw; break;
+            case 't': mainController.tileDraw = !mainController.tileDraw; mainController.exportTileMap(); break;
                 break;
         }
     });

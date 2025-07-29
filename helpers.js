@@ -35,8 +35,6 @@ const Color = {
 
         color = r * 0x010000 + g * 0x000100 + b;
 
-        // console.log(color);
-
         return Color.toString(color);
     },
 
@@ -165,7 +163,7 @@ function makeTimeString(ms) {
 }
 
 function testMobile() {
-    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    return 'ontouchstart' in window;
 }
 
 const SaveManager = {
@@ -188,30 +186,24 @@ const SaveManager = {
     },
 }
 
-function makeRandomGenerator(inc, div, start = 1) {
-    var i = start;
-
-    return [() => {
-        i++;
-        
-        return ((i * inc)%div) / div;
-    }, () => i];
-}
-
 class Randomizer {
     inc;
     div;
     i;
+    basei;
 
     constructor(inc, div, start = 1) {
         this.inc = inc;
         this.div = div;
-        this.i = start;
+        this.basei = this.i = start;
+    }
+
+    reset() {
+        this.i = this.basei;
     }
 
     next() {
         this.i++;
-
         return ((this.i * this.inc) % this.div) / this.div;
     }
 }
@@ -219,4 +211,35 @@ class Randomizer {
 var fakeRandomizer = {
     i: 1,
     next: Math.random,
+}
+
+class FlyingText {
+    x;
+    y;
+    color;
+    text;
+    alpha = 1;
+    vY;
+    vA;
+    size;
+
+    constructor(x, y, text, color, size, moveSpeed, alphaSpeed) {
+        this.x = x;
+        this.y = y;
+        this.text = text;
+        this.color = color;
+        this.size = size;
+        this.vY = moveSpeed;
+        this.vA = alphaSpeed;
+    }
+
+    update = (canvas) => {
+        this.y -= this.vY;
+        this.alpha -= this.vA;
+        canvas.addText(this.x, this.y, this.text, this.size, this.color, this.alpha);
+    }
+
+    get isComplete() {
+        return this.alpha <= 0;
+    }
 }

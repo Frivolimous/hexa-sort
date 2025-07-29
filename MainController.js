@@ -230,6 +230,14 @@ class MainController {
         }
     }
 
+    exportTileMap() {
+        var str = this.data.board.filter(el => el).map(spot => `{x: ${spot.x}, y: ${spot.y}, stack: ['R', 3, 8]}`).join(`,
+`);
+        console.log(`[
+${str}
+]`)
+    }
+
     setupBoard(layout, historicData) {
         if (historicData) {
             this.historicData = historicData;
@@ -250,11 +258,11 @@ class MainController {
                 layout,
                 history: []
             };
-    
+
             SaveManager.clearHistoricData();
-    
+
             if (layout.randomizer) {
-                    StackManager.randomizer = new Randomizer(layout.randomizer.inc, layout.randomizer.div, layout.start);
+                StackManager.randomizer = new Randomizer(layout.randomizer.inc, layout.randomizer.div, layout.randomizer.start);
             } else {
                 StackManager.randomizer = fakeRandomizer;
             }

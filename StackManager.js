@@ -149,10 +149,35 @@ const StackManager = {
         data.board.forEach(spot => {
             if (spot && spot.stack.length >= 10) {
                 if (spot.stack.length >= 10 && StackManager.countTopColor(spot.stack) >= 10) {
-                    data.score += StackManager.purgeTopColor(spot.stack);
+                    var loc = canvasView.getGlobalFromTile(spot.x, spot.y);
+                    loc.y -= spot.stack.length * 3 + 20;
+                    loc.x -= 15;
+                    var count = StackManager.purgeTopColor(spot.stack);
+                    
+                    var score = this.getScoreAmount(count, data);
+                    var calc = this.getScoreCalc(count, data);
+                    
+                    data.score += score;
+
+                    flyingText = new FlyingText(loc.x - 2, loc.y - 2, calc, '#ffffff', 30, 1, 0.02);
+                    canvasView.vfx.push(flyingText);
+                    var flyingText = new FlyingText(loc.x, loc.y, calc, '#000000', 30, 1, 0.02);
+                    canvasView.vfx.push(flyingText);
                 }
             }
         });
+    },
+
+    getScoreCalc(count, data) {
+        if (count === 10) {
+            return count.toFixed(0);
+        } else {
+            return `10 + ${(count - 10).toFixed(0)} x 2`;
+        }
+    },
+
+    getScoreAmount(count, data) {
+        return 10 + (count - 10) * 2;
     },
 
     findAllGroups(data) {
@@ -309,16 +334,14 @@ const StackManager = {
     },
 
     generateRandomPaletteStack(paletteSpawnIndex) {
-        var maxColor = StackManager.getMaxColorIndex(paletteSpawnIndex);
-
-        let total = StackManager.getRandomTotalSize(paletteSpawnIndex);
-        let count = StackManager.getRandomNumColors(paletteSpawnIndex, total);
+        var config = StackManager.getPaletteOrderConfig(paletteSpawnIndex);
+        let total = config.minSize + Math.floor(StackManager.randomizer.next() * (config.maxSize + 1 - config.minSize));
+        let count = Math.min(total, 3, Math.ceil(StackManager.randomizer.next() * config.numStacks));
 
         let counts = [0, 0, 0];
         let colors = [-1, -1, -1];
-
         
-        colors[0] = Math.floor(StackManager.randomizer.next() * (maxColor + 1));
+        colors[0] = Math.floor(StackManager.randomizer.next() * (config.maxColorIndex + 1));
         if (count > 1) {
             counts[0] = Math.ceil(StackManager.randomizer.next() * (total - count + 1));
         } else {
@@ -327,7 +350,7 @@ const StackManager = {
 
         if (count >= 2) {
             do {
-                colors[1] = Math.floor(StackManager.randomizer.next() * (maxColor + 1));
+                colors[1] = Math.floor(StackManager.randomizer.next() * (config.maxColorIndex + 1));
             } while (colors[1] === colors[0]);
             if (count > 2) {
                 counts[1] = Math.ceil(StackManager.randomizer.next() * (total - counts[0] - count + 2));
@@ -338,7 +361,7 @@ const StackManager = {
 
         if (count === 3) {
             do {
-                colors[2] = Math.floor(StackManager.randomizer.next() * (maxColor + 1));
+                colors[2] = Math.floor(StackManager.randomizer.next() * (config.maxColorIndex + 1));
             } while (colors[2] === colors[0] || colors[2] === colors[1]);
 
             counts[2] = total - counts[0] - counts[1];
@@ -355,32 +378,20 @@ const StackManager = {
         return stack;
     },
 
-    getRandomTotalSize(paletteSpawnIndex) {
-        var min = Math.min(4, Math.floor(paletteSpawnIndex / 20) + 2);
-        var max = 6;
-        return min + Math.floor(StackManager.randomizer.next() * (max + 1 - min));
-    },
-
-    getRandomNumColors(paletteSpawnIndex, stackSize) {
-        return Math.min(stackSize, 3, Math.ceil(StackManager.randomizer.next() * (2 + paletteSpawnIndex / 20)));
-    },
-
-    getMaxColorIndex(paletteSpawnIndex) {
-        var thresholds = [
-            0,
-            0,
-            0,
-            3,  //3
-            6, //4
-            12, //5
-            15, //6
-            21, //7
-            // 36, //8 : BROWN
-            // 57, // 9 : PINK
-        ];
-
-        for (var count = thresholds.length - 1; count >= 0; count--) {
-            if (paletteSpawnIndex >= thresholds[count]) return count;
+    getPaletteOrderConfig(paletteSpawnIndex) {
+        for (var count = PaletteOrderConfigs.length - 1; count >= 0; count--) {
+            if (paletteSpawnIndex >= PaletteOrderConfigs[count].minStackPlaced) return PaletteOrderConfigs[count];
         }
     }
 }
+
+const PaletteOrderConfigs = [
+    { minStackPlaced: 0,   maxColorIndex: 2, minSize: 3, maxSize: 6, numStacks: 2 },
+    { minStackPlaced: 3,   maxColorIndex: 3, minSize: 3, maxSize: 6, numStacks: 2.1 },
+    { minStackPlaced: 6,   maxColorIndex: 4, minSize: 3, maxSize: 6, numStacks: 2.3 },
+    { minStackPlaced: 12,  maxColorIndex: 5, minSize: 3, maxSize: 6, numStacks: 2.6 },
+    { minStackPlaced: 15,  maxColorIndex: 6, minSize: 3, maxSize: 6, numStacks: 2.8 },
+    { minStackPlaced: 21,  maxColorIndex: 7, minSize: 4, maxSize: 6, numStacks: 3 },
+    { minStackPlaced: 30,  maxColorIndex: 7, minSize: 4, maxSize: 6, numStacks: 3.5 },
+    { minStackPlaced: 40,  maxColorIndex: 7, minSize: 4, maxSize: 6, numStacks: 4 },
+]
