@@ -163,9 +163,9 @@ class MainController {
             this.erasing = false;
 
             if (this.selectedPointerIndex >= 0) {
-                let offset = 10;
+                let offset = -10;
                 if (isMobile) {
-                    offset = 10 - 80;
+                    offset = -10 - 80;
                 }
 
                 var index = this.getTileIndexFromGlobal(e.x, e.y + offset);
@@ -229,47 +229,39 @@ class MainController {
         }
 
         canvasView.canvas.onClick = (e) => {
-        //     console.log('click');
+            var index = this.getTileIndexFromGlobal(e.x, e.y);
+            if (index >= 0) {
+                var tile = this.data.board[index];
+                if (!tile) return;
 
-        //     var index = this.getTileIndexFromGlobal(e.x, e.y);
-        //     if (index >= 0) {
-        //         var tile = this.data.board[index];
+                var loc = canvasView.getGlobalFromTile(tile.x, tile.y);
+                loc.x -= 10;
+                loc.y += 10 - tile.stack.length * 3;
 
-        //         console.log(tile.x, tile.y);
-        //         if (tile && tile.x === 6 && tile.y === 7) {
-        //             new PermaDot(e.x, e.y);
-        //             canvasView.getTileFromGlobal(e.x, e.y, true);
-        //         }
+                var currentColor = -1;
+                var numCurrent = 0;
+                var numColors = 0;
+                if (tile && tile.stack.length > 0) {
+                    for (var i = 0; i < tile.stack.length; i++) {
+                        if (tile.stack[i] === currentColor) {
+                            numCurrent++;
+                        } else{
+                            if (currentColor >= 0) {
+                                let flyingText = new FlyingText(loc.x, loc.y - numColors * 35, numCurrent, Colors.INDEXED[currentColor], 30, 1, 0.02);
+                                canvasView.vfx.push(flyingText);    
+                            }
+                            numColors++;
+                            currentColor = tile.stack[i];
+                            numCurrent = 1;
+                        }
+                    }
 
-        //         var loc = canvasView.getGlobalFromTile(tile.x, tile.y);
-        //         loc.x -= 10;
-        //         loc.y += 10 - tile.stack.length * 3;
-
-        //         var currentColor = -1;
-        //         var numCurrent = 0;
-        //         var numColors = 0;
-        //         if (tile && tile.stack.length > 0) {
-        //             for (var i = 0; i < tile.stack.length; i++) {
-        //                 if (tile.stack[i] === currentColor) {
-        //                     numCurrent++;
-        //                 } else{
-        //                     if (currentColor > 0) {
-        //                         let flyingText = new FlyingText(loc.x, loc.y - numColors * 35, numCurrent, Colors.INDEXED[currentColor], 30, 1, 0.02);
-        //                         canvasView.vfx.push(flyingText);    
-        //                     }
-        //                     numColors++;
-        //                     currentColor = tile.stack[i];
-        //                     numCurrent = 0;
-        //                 }
-        //             }
-
-        //             if (currentColor > 0) {
-        //                 let flyingText = new FlyingText(loc.x, loc.y - numColors * 35, numCurrent, Colors.INDEXED[currentColor], 30, 1, 0.02);
-        //                 canvasView.vfx.push(flyingText);    
-
-        //             }
-        //         }
-        //     }
+                    if (currentColor >= 0) {
+                        let flyingText = new FlyingText(loc.x, loc.y - numColors * 35, numCurrent, Colors.INDEXED[currentColor], 30, 1, 0.02);
+                        canvasView.vfx.push(flyingText);  
+                    }
+                }
+            }
         }
     }
 

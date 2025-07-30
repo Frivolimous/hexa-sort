@@ -233,7 +233,7 @@ class CanvasRender {
         this.Graphic.lineTo(x1, y1);
         this.Graphic.closePath();
 
-        this.Graphic.lineWidth = "1";
+        this.Graphic.lineWidth = "3";
         this.Graphic.strokeStyle = color;
         this.Graphic.globalAlpha = 1;
         this.Graphic.stroke();

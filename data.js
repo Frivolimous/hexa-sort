@@ -779,6 +779,21 @@ const layouts = [
         //     start: 33
         // },
     },
+        {
+        board: `1111111
+                1111111
+                1111111
+                1111111
+                1111111`,
+        offset: {x: 0, y: 0},
+        startingRadius: 50,
+        stacks: [
+        ],
+        tileHp: 2,
+        numPalette: 3,
+        // active: true,
+        name: 'BLANK',
+    },
 ];
 
 const Colors = {
