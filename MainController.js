@@ -229,7 +229,7 @@ class MainController {
         }
 
         canvasView.canvas.onClick = (e) => {
-            var index = this.getTileIndexFromGlobal(e.x, e.y);
+            var index = this.getTileIndexFromGlobal(e.x, e.y, true);
             if (index >= 0) {
                 var tile = this.data.board[index];
                 if (!tile) return;
