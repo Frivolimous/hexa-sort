@@ -9,6 +9,7 @@ class CanvasRender {
     onPointerUpAnywhere;
     onPointerMove;
     onSwipe;
+    onClick;
 
     constructor(width, height, element) {
         this.Element = element;
@@ -38,6 +39,10 @@ class CanvasRender {
             
             var location = {x: e.offsetX * element.width / r.width, y: e.offsetY * element.height / r.height};
             this.onPointerUp && this.onPointerUp(location);
+
+            if (this.onClick && swiping && (Math.abs(swiping.x - location.x) + Math.abs(swiping.y - location.y)) < 20) {
+                this.onClick(location);
+            }
 
             swiping = null;
         });
@@ -139,13 +144,11 @@ class CanvasRender {
 
     drawHexagon2(x, y, radius, strokeWeight, fillColor, alpha = 1, tilt = 0.5){
         this.Graphic.beginPath();
-        this.Graphic.beginPath();
         var a = 2 * Math.PI / 6;
         for (var i = 0; i < 6; i++) {
             this.Graphic.lineTo(x + radius * Math.cos(a * i), y + tilt * (radius * Math.sin(a * i)));
         }
         this.Graphic.closePath();
-        this.Graphic.stroke();
         this.Graphic.lineWidth = "3";
         this.Graphic.strokeStyle = Color.luminance(fillColor, strokeWeight);
         this.Graphic.fillStyle = fillColor;
@@ -223,12 +226,27 @@ class CanvasRender {
         this.Graphic.stroke();
         this.Graphic.globalAlpha = 1;
     }
+
+    drawLine(x0, y0, x1, y1, color) {
+        this.Graphic.beginPath();
+        this.Graphic.moveTo(x0, y0);
+        this.Graphic.lineTo(x1, y1);
+        this.Graphic.closePath();
+
+        this.Graphic.lineWidth = "1";
+        this.Graphic.strokeStyle = color;
+        this.Graphic.globalAlpha = 1;
+        this.Graphic.stroke();
+    }
     
     addText(x, y, text, size = 50, color = '#000000', alpha = 1) {
         this.Graphic.font = `${size}px Arial`;
         this.Graphic.fillStyle = color;
+        this.Graphic.strokeStyle = '#000000';
+        this.Graphic.lineWidth = '1';
         this.Graphic.globalAlpha = Math.max(alpha, 0);
         this.Graphic.fillText(text, x, y);
+        this.Graphic.strokeText(text, x, y);
         this.globalAlpha = 1;
     }
 }

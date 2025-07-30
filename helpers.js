@@ -243,3 +243,43 @@ class FlyingText {
         return this.alpha <= 0;
     }
 }
+
+class PermaDot {
+    x;
+    y;
+    color;
+    isComplete = false;
+
+    constructor(x, y, color = '#ffffff') {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        canvasView.vfx.push(this);
+    }
+
+    update = (canvas) => {
+        canvas.drawRect(this.x, this.y, 1, 1, this.color, this.color);
+    }
+}
+
+class PermaLine {
+    x0;
+    y0;
+    x1;
+    y1;
+    color;
+    isComplete = false;
+
+    constructor(x0, y0, x1, y1, color = '#ffffff') {
+        this.x0 = x0;
+        this.y0 = y0;
+        this.x1 = x1;
+        this.y1 = y1;
+        this.color = color;
+        canvasView.vfx.push(this);
+    }
+
+    update = (canvas) => {
+        canvas.drawLine(this.x0, this.y0, this.x1, this.y1, this.color);
+    }
+}

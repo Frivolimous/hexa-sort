@@ -159,9 +159,7 @@ const StackManager = {
                     
                     data.score += score;
 
-                    flyingText = new FlyingText(loc.x - 2, loc.y - 2, calc, '#ffffff', 30, 1, 0.02);
-                    canvasView.vfx.push(flyingText);
-                    var flyingText = new FlyingText(loc.x, loc.y, calc, '#000000', 30, 1, 0.02);
+                    var flyingText = new FlyingText(loc.x - 2, loc.y - 2, calc, '#ffffff', 30, 1, 0.015);
                     canvasView.vfx.push(flyingText);
                 }
             }
