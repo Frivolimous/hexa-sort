@@ -1,4 +1,4 @@
-const gameConfig = {
+export const gameConfig = {
     framerate: 30,
     canvasWidth: 800,
     canvasHeight: 800,
@@ -6,7 +6,7 @@ const gameConfig = {
     defaultLayout: 7,
 }
 
-const layouts = [
+export const layouts = [
     {
         board: `0000000
                 0011100
@@ -796,7 +796,7 @@ const layouts = [
     },
 ];
 
-const Colors = {
+export const Colors = {
     RED: '#ff0000',
     GREEN: '#00ff00',
     BLUE: '#0000ff',

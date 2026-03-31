@@ -1,4 +1,4 @@
-class JMTicker {
+export class JMTicker {
     running = false;
     paused = false;
     tickDelay = 30;

@@ -1,4 +1,6 @@
-class CanvasRender {
+import {Color} from "./helpers.js";
+
+export class CanvasRender {
     Element;
     Graphic;
     Width;

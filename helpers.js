@@ -1,4 +1,4 @@
-class Timer {
+export class Timer {
     delay = 0;
 
     minDelay;
@@ -22,7 +22,7 @@ class Timer {
     }
 }
 
-const Color = {
+export const Color = {
     luminance: (color, lum) => {
         color = Color.fromString(color);
         let r = Math.floor(color / 0x010000);
@@ -59,7 +59,7 @@ const Color = {
     }
 }
 
-class ColorGradient {
+export class ColorGradient {
     startColor;
     R;
     G;
@@ -90,7 +90,7 @@ class ColorGradient {
     }
 }
 
-class MultGauge {
+export class MultGauge {
 gradient1 = new ColorGradient(0xff0000, 0xffcc00);
 gradient2 = new ColorGradient(0xffcc00, 0xffff00);
 gradient3 = new ColorGradient(0xffff00, 0x00ff00);
@@ -154,7 +154,7 @@ update(canvas, percent) {
 }
 }
 
-function makeTimeString(ms) {
+export function makeTimeString(ms) {
     var seconds = Math.floor(ms / 1000);
     var minutes = Math.floor(seconds / 60);
     seconds -= minutes * 60;
@@ -162,11 +162,11 @@ function makeTimeString(ms) {
     return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
 
-function testMobile() {
+export function testMobile() {
     return 'ontouchstart' in window;
 }
 
-const SaveManager = {
+export const SaveManager = {
     saveHistoricData(data) {
             window.localStorage.setItem('HexHistoricData', JSON.stringify(data));
     },
@@ -186,7 +186,7 @@ const SaveManager = {
     },
 }
 
-class Randomizer {
+export class Randomizer {
     inc;
     div;
     i;
@@ -208,12 +208,12 @@ class Randomizer {
     }
 }
 
-var fakeRandomizer = {
+export var fakeRandomizer = {
     i: 1,
     next: Math.random,
 }
 
-class FlyingText {
+export class FlyingText {
     x;
     y;
     color;
@@ -244,7 +244,7 @@ class FlyingText {
     }
 }
 
-class PermaDot {
+export class PermaDot {
     x;
     y;
     color;
@@ -262,7 +262,7 @@ class PermaDot {
     }
 }
 
-class PermaLine {
+export class PermaLine {
     x0;
     y0;
     x1;

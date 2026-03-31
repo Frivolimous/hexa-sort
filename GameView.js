@@ -1,4 +1,8 @@
-class GameView {
+import {CanvasRender} from "./CanvasRender.js";
+import {gameConfig} from "./data.js";
+import {mainController} from "./main.js";
+
+export class GameView {
     canvas;
     vfx = [];
     left = 200;

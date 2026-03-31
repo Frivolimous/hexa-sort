@@ -1,15 +1,22 @@
+import {testMobile} from "./helpers.js";
+import {MainController} from "./MainController.js";
+import {GameView} from "./GameView.js";
+import {layouts} from "./data.js";
+import {SaveManager} from "./helpers.js";
+import {gameConfig} from "./data.js";
+
 const header = {
     interactions: document.getElementById('interaction-select-container'),
 };
 
 // GameControl
-var mainController;
+export var mainController;
 
 // Views
-var canvasView;
-var isMobile;
+export var canvasView;
+export var isMobile;
 var stepper = document.getElementById('stepper');
-var autostepper = document.getElementById('auto-stepper');
+export var autostepper = document.getElementById('auto-stepper');
 var infoblock = document.getElementById('infoblock');
 var undobutton = document.getElementById('undobutton');
 var resetbutton = document.getElementById('resetbutton');

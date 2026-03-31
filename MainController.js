@@ -1,5 +1,10 @@
+import {StackManager} from "./StackManager.js";
+import {SaveManager, makeTimeString, Randomizer, fakeRandomizer} from "./helpers.js";
+import {JMTicker} from "./JMTicker.js";
+import { gameConfig, Colors } from "./data.js";
+import { canvasView, autostepper, isMobile } from "./main.js";
 
-class MainController {
+export class MainController {
     ticker = new JMTicker(gameConfig.framerate);
     andDraw = true;
         

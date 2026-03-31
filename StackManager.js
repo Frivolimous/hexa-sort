@@ -1,4 +1,8 @@
-const StackManager = {
+import { FlyingText } from './helpers.js';
+import { fakeRandomizer } from './helpers.js';
+import { canvasView } from './main.js';
+
+export const StackManager = {
     randomizer: fakeRandomizer,
 
     countTopColor(stack) {
